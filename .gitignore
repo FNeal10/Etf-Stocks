@@ -1,6 +1,10 @@
 # Virtual Environment
 venv/
 
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
 # Environment
 .env
 .env.local

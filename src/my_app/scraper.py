@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
-from src.my  azure_blob_utils import *
+from src.data.azure_blob_utils import get_urls
 
 
 def init_driver():
@@ -24,3 +24,6 @@ if __name__ == "__main__":
     
     driver = init_driver()
     data = get_urls()
+
+    print(data)
+
