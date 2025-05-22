@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+
+# Environment
+.env
+.env.local
+.env.development.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Data Files
+data/
+
+
+
