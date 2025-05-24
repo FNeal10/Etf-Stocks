@@ -25,4 +25,5 @@ jobs:
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          PYTHONPATH: .
         run: python scripts/run_scraper.py
