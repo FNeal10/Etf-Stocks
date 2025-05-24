@@ -16,10 +16,10 @@ from src.data.blob_utils import get_urls, append_prices
 
 def init_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  
-    chrome_options.add_argument("--no-sandbox") 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    chrome_options.add_argument("--headless=new") 
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080") 
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
 def extract_prices(driver, xpath):
@@ -31,7 +31,6 @@ def process_url(driver, url):
     current_price = {}
     try:
         if 'www.pse.com' in url:
-            print(url)
             driver.get(url)
             iFrame = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "company_infos")))
@@ -50,9 +49,8 @@ def process_url(driver, url):
     except Exception as e:
         print(f"Error processing URL {url}: {e}")
         return None
-    
-if __name__ == "__main__":    
-    
+
+def main():    
     load_dotenv()
     
     driver = init_driver()
@@ -67,11 +65,13 @@ if __name__ == "__main__":
         tickerType = row['TYPE']
         
         prices = process_url(driver, url)
-
         if prices:
             prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
             append_prices(container_client, ticker, tickerType, prices_list)
 
-        #time.sleep(5)
+        sleep(5)
 
     driver.quit()
+
+if __name__ == "__main__":    
+    main()

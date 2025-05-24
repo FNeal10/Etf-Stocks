@@ -30,4 +30,4 @@ def append_prices(container, ticker:str, tickerType:str, prices:list):
     updated_blob_data = df.to_csv(index=False).encode('utf-8')
     blob_client.upload_blob(updated_blob_data, overwrite=True)
 
-    return 1
+    return
