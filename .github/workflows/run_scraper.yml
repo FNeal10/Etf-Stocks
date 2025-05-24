@@ -3,13 +3,16 @@ name: Call run_scraper.py to run on weekdays at 9 PM
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 13 * * 1-5'
+    - cron: '0 13 * * 1-5'  
 
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3   
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -17,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-
+                            
       - name: Run scraper
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
