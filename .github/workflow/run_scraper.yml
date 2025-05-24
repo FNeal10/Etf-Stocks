@@ -1,6 +1,7 @@
 name: Call run_scraper.py to run on weekdays at 9 PM
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 13 * * 1-5'
 
