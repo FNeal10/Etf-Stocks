@@ -1,4 +1,4 @@
-name: Call run_scraper.py to run on weekdays at 9 PM
+name: Run scraper
 
 on:
   workflow_dispatch:
