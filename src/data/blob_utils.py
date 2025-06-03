@@ -31,3 +31,8 @@ def append_prices(container, ticker:str, tickerType:str, prices:list):
     blob_client.upload_blob(updated_blob_data, overwrite=True)
 
     return
+
+def get_list_of_files(container):
+    blobs = container.list_blobs(name_starts_with="bronze/")
+    csv_files = [blob.name for blob in blobs if blob.name.lower().endswith(".csv")]
+    return csv_files
