@@ -30,7 +30,7 @@ def extract_prices(driver, xpath):
 def process_url(driver, url):
     current_price = {}
     try:
-        if 'www.pse.com' in url:
+        if 'com.ph' in url:
             driver.get(url)
             iFrame = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "company_infos")))
@@ -51,6 +51,7 @@ def process_url(driver, url):
         return None
 
 def main():    
+    print("Loading environment variables...")
     load_dotenv()
     
     driver = init_driver()
