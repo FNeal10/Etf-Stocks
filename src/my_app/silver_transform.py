@@ -4,12 +4,9 @@ from io import StringIO
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
 
-service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
-container = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
+def clean_and_add_features(df: pd.DataFrame, source: str):
 
-def clean_add_features(df: pd.DataFrame, source: str):
-
-    df.insert(0, source)
+    df.insert(0, "Source", source)
     df["Volume"] = df["Volume"].str.replace(',','').astype(int)
     df["Date"] = pd.to_datetime(df["Date"], format='%m/%d/%Y')
 
@@ -32,24 +29,32 @@ def clean_add_features(df: pd.DataFrame, source: str):
  
     return df
 
-def save_silver(data: pd.DataFrame):
-    blob_name = f"silver/etf_silver.csv"
-    blob_client = container.get_blob_client(blob=blob_name)
-    
-    data = data.to_csv(index=False).encode('utf-8')
-    blob_client.upload_blob(data, overwrite=True)
+def upload_silver_to_blob(data, containerName, blobName):
+    csv_buffer = StringIO()
+    data.to_csv(csv_buffer, index=False)
+    csv_buffer.seek(0)
 
-def get_record():
-    staging = []
-    for blob in container.list_blobs(name_starts_with="bronze/bdo.csv"):
+    #blob_service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
+    blob_client = service_client.get_blob_client(container=containerName, blob=blobName)
+
+    blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
+
+
+def main():
+    load_dotenv()
+
+    service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
+    blob_container = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
+
+    for blob in blob_container.list_blobs(name_starts_with="bronze/bdo.csv"):
         if blob.name.endswith('.csv'):
-            blob_client = container.get_blob_client(blob.name)
+            blob_client = blob_container.get_blob_client(blob.name)
             content = blob_client.download_blob().readall().decode('utf-8')
 
             file = pd.read_csv(StringIO(content))
-            staging.append(clean_add_features(file, os.path.basename(blob.name).replace('csv','')))
-            
-    save_silver(staging)
+            final = clean_and_add_features(file, os.path.basename(blob.name).replace('.csv',''))
+    
+    upload_silver_to_blob(final, blob_container, "silver/etf/silver_output.csv")
 
 if __name__ == "__main__":
-    get_record()
+    main()

@@ -27,10 +27,10 @@ def extract_prices(driver, xpath):
     print(element.text)
     return element.text.replace('"','').strip()
 
-def process_url(driver, url):
+def process_url(driver, url, tickerType):
     current_price = {}
     try:
-        if 'com.ph' in url:
+        if tickerType == "stocks":
             driver.get(url)
             iFrame = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "company_infos")))
@@ -63,14 +63,14 @@ def main():
     for _, row in data.iterrows():
         url = row['URL']
         ticker = row['TICKER'].lower()
-        tickerType = row['TYPE']
+        tickerType = row['TYPE'].lower()
         
-        prices = process_url(driver, url)
+        prices = process_url(driver, url, tickerType)
         if prices:
             prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
             append_prices(container_client, ticker, tickerType, prices_list)
 
-        sleep(5)
+        sleep(10)
 
     driver.quit()
 
