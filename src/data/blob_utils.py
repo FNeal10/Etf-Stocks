@@ -32,7 +32,17 @@ def append_prices(container, ticker:str, tickerType:str, prices:list):
 
     return
 
+def save_to_silver(container, etfPrices):
+    blob_name = f"silver/etf_silver.csv"
+    blob_client = container.get_blob_client(blob=blob_name)
+    
+    data = etfPrices.to_csv(index=False).encode('utf-8')
+    blob_client.upload_blob(data, overwrite=True)
+    
+    
+
 def get_list_of_files(container):
     blobs = container.list_blobs(name_starts_with="bronze/")
     csv_files = [blob.name for blob in blobs if blob.name.lower().endswith(".csv")]
     return csv_files
+
