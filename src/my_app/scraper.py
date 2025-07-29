@@ -54,7 +54,8 @@ def process_url(driver, url, tickerType):
         driver.switch_to.default_content()
 
 def main():    
-    print("Loading environment variables...")
+    append_to_log("Starting scraper process")
+    
     load_dotenv()
     
     driver = init_driver()
