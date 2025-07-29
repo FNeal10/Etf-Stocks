@@ -13,6 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from azure.storage.blob import BlobServiceClient
 
 from src.data.blob_utils import get_urls, append_prices
+from src.utils.helper import  append_to_log
 
 def init_driver():
     chrome_options = Options()
@@ -23,7 +24,7 @@ def init_driver():
     return driver
 
 def extract_prices(driver, xpath):
-    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
+    element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
     print(element.text)
     return element.text.replace('"','').strip()
 
@@ -32,9 +33,9 @@ def process_url(driver, url, tickerType):
     try:
         if tickerType == "stocks":
             driver.get(url)
-            iFrame = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, "company_infos")))
-            driver.switch_to.frame(iFrame)
+            WebDriverWait(driver, 20).until(
+                EC.frame_to_be_available_and_switch_to_it((By.ID, "company_infos")))
+            #driver.switch_to.frame(iFrame)
 
             current_price = {
                 "open": extract_prices(driver,"/html/body/div/div/div/div[3]/div[1]/div/div[3]/table/tbody/tr[1]/td[4]"),
@@ -49,6 +50,8 @@ def process_url(driver, url, tickerType):
     except Exception as e:
         print(f"Error processing URL {url}: {e}")
         return None
+    finally:
+        driver.switch_to.default_content()
 
 def main():    
     print("Loading environment variables...")
@@ -70,7 +73,7 @@ def main():
             prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
             append_prices(container_client, ticker, tickerType, prices_list)
 
-        sleep(10)
+        sleep(20)
 
     driver.quit()
 
