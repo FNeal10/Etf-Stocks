@@ -56,14 +56,14 @@ def main():
 
     bronzeLocation = os.getenv("BRONZE_LOCATION")
     silverFileOutput = os.getenv("SILVER_OUTPUT")
-    print(bronzeLocation)
+   
     for blob in blobContainer.list_blobs(name_starts_with=f"{bronzeLocation}"):
         print(blob.name)
         blob_client = blobContainer.get_blob_client(blob.name)
         content = blob_client.download_blob().readall().decode('utf-8')
 
         file = pd.read_csv(StringIO(content))
-        final = clean_and_add_features(file, os.path.basename(blob.name).replace('.csv',''))
+        final = clean_and_add_features(file.head(1), os.path.basename(blob.name).replace('.csv',''))
 
         combined_df = pd.concat([combined_df, final], ignore_index=True)
     upload_silver_to_blob(combined_df, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFileOutput}silver_output.csv")

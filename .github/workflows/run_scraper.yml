@@ -27,3 +27,5 @@ jobs:
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
+      
+      - name: Consolidate stocks 
