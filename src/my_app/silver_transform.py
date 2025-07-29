@@ -9,6 +9,7 @@ def clean_and_add_features(df: pd.DataFrame, source: str):
     df.insert(0, "Source", source)
     df["Volume"] = df["Volume"].str.replace(',','').astype(int)
     df["Date"] = pd.to_datetime(df["Date"], format='%m/%d/%Y')
+    
 
     # Dates
     df["Month"] = df["Date"].dt.month
