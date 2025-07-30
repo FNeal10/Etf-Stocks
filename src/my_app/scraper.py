@@ -54,8 +54,8 @@ def process_url(driver, url, tickerType):
         driver.switch_to.default_content()
 
 def main():    
-    append_to_log("Starting scraper process")
-    
+    append_to_log("#### Starting scraper ####")
+
     load_dotenv()
     
     driver = init_driver()
@@ -63,15 +63,18 @@ def main():
     service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
     container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
 
+    append_to_log("Getting URLs from blob storage...")
     data = get_urls(container_client)
     for _, row in data.iterrows():
         url = row['URL']
         ticker = row['TICKER'].lower()
         tickerType = row['TYPE'].lower()
         
+        append_to_log(f"Getting latest market price for {ticker.upper()}")
         prices = process_url(driver, url, tickerType)
         if prices:
             prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
+            append_to_log(f"Appending price for {ticker.upper()}")
             append_prices(container_client, ticker, tickerType, prices_list)
 
         sleep(20)

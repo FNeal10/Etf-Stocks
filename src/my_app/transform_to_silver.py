@@ -24,8 +24,8 @@ def clean_and_add_features(df: pd.DataFrame, source: str):
     df["Year"] = df["Date"].dt.year
     df["DayOfWeek"] = df["Date"].dt.dayofweek
 
-    df["MA_5"] = df["Close"].rolling(5).mean().apply(format_to_decimal)
-    df["MA_20"] = df["Close"].rolling(20).mean().apply(format_to_decimal)
+    df["MA_5"] = df["Close"].rolling(5).std().apply(format_to_decimal)
+    df["MA_20"] = df["Close"].rolling(20).std().apply(format_to_decimal)
     df["EMA_5"] = df["Close"].ewm(span=5, adjust=False).mean().apply(format_to_decimal)
     df["EMA_20"] = df["Close"].ewm(span=20, adjust=False).mean().apply(format_to_decimal)
     df["STD_5"] = df["Close"].rolling(5).mean().apply(format_to_decimal)
@@ -42,10 +42,19 @@ def upload_silver_to_blob(df, serviceClient, containerName, blobName):
     df.to_csv(csv_buffer, index=False)
     csv_buffer.seek(0)
 
-    #blob_service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
     blob_client = serviceClient.get_blob_client(container=containerName, blob=blobName)
-
     blob_client.upload_blob(csv_buffer.getvalue(), overwrite=True)
+
+def append_latest_to_silver(df, serviceClient, containerName, blobName):
+    try:
+        blob_client = serviceClient.get_blob_client(container=containerName, blob=blobName)
+        existing_data = blob_client.download_blob().readall().decode('utf-8')
+        existing_df = pd.read_csv(StringIO(existing_data))
+        df = pd.concat([existing_df, df], ignore_index=True)
+    except Exception as e:
+        print(f"Error reading existing data: {e}")
+
+    upload_silver_to_blob(df, serviceClient, containerName, blobName)
 
 def main():
     
@@ -67,6 +76,7 @@ def main():
 
         combined_df = pd.concat([combined_df, final], ignore_index=True)
     upload_silver_to_blob(combined_df, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFileOutput}silver_output.csv")
+    #append_latest_to_silver(combined_df, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFileOutput}silver_output.csv")
     return combined_df
 
 

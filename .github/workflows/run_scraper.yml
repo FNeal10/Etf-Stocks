@@ -21,11 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
                             
-      - name: Run scraper
+      - name: Run scraper to get the latest stock prices
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
-      
-      - name: Consolidate stocks 
