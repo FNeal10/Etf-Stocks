@@ -27,3 +27,12 @@ jobs:
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
+      
+      - name: Run silver transformation script
+        env:
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
+          PYTHONPATH: .
+        run: python scripts/run_transform_to_silver.py
