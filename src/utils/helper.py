@@ -13,7 +13,7 @@ def format_to_decimal(value):
     Removes commas and handles errors safely.
     """
     if isinstance(value, str):
-        value = value.replace(',', '').replace('"',"").replace("'","")  # Remove thousands separator
+        value = value.replace(',', '').replace('"',"").replace("'","")
     try:
         return f"{float(value):.2f}"
     except (ValueError, TypeError):
