@@ -89,13 +89,13 @@ def main():
         data = pd.read_csv(StringIO(stockPrices), keep_default_na=True, parse_dates=["Date"])
 
         data = data.head(1)
-        #data = clean_data(data)
+        data = clean_data(data)
         data = add_features(data, os.path.basename(blob.name).replace('.csv',''))
 
         combinedData = pd.concat([combinedData, data], ignore_index=True)
 
-    upload_silver_to_blob(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
-    #append_latest_to_silver(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
+    #upload_silver_to_blob(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
+    append_latest_to_silver(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
     return combinedData, data
 
 if __name__ == "__main__":
