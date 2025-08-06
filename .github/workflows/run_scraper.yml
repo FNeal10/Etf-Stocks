@@ -35,4 +35,4 @@ jobs:
           BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
           SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
           PYTHONPATH: .
-        run: python scripts/run_transform_to_silver.py
+        run: python scripts/run_silver.py
