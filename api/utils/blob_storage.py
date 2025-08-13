@@ -13,7 +13,8 @@ load_dotenv()
 service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
 container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
 
-silver_etf_path = os.getenv("SILVER_LOCATION")
+bronze_path = os.getenv("BRONZE_LOCATION")
+silver_path = os.getenv("SILVER_LOCATION")
 
 def get_market_urls():
     """
@@ -40,7 +41,7 @@ def append_latest_ohclv(ticker_name, market_data:list):
     :param priceInfo: List containing the OHLCV price information.
     :return: None
     """
-    blob_name = f"bronze/{ticker_name}.csv"
+    blob_name = f"{bronze_path}{ticker_name}.csv"
     blob_client = container_client.get_blob_client(blob=blob_name)
     blob_data = blob_client.download_blob().readall()
     existing_data = pd.read_csv(BytesIO(blob_data))
@@ -73,7 +74,7 @@ def get_file_data(file_name):
     :param file_name: Name of the file to fetch data from.
     :return: DataFrame containing the file data.
     """
-    blob_name = f"bronze/{file_name}"
+    blob_name = f"{bronze_path}{file_name}"
     blob_client = container_client.get_blob_client(blob=blob_name)
 
     try:
@@ -91,7 +92,7 @@ def create_silver_file(silver_file):
     :param parquet_file: Parquet file data.
     :return: None
     """
-    blob_name = f"{silver_etf_path}{datetime.now().strftime('%Y-%m%d')}.csv"
+    blob_name = f"{silver_path}{datetime.now().strftime('%Y-%m%d')}.csv"
     blob_client = container_client.get_blob_client(blob=blob_name)
 
     try:

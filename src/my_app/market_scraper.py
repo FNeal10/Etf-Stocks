@@ -1,6 +1,5 @@
 from datetime import datetime
 from time import sleep
-import os
 
 from dotenv import load_dotenv
 from selenium import webdriver  
@@ -11,8 +10,11 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from azure.storage.blob import BlobServiceClient
+from concurrent.futures import ThreadPoolExecutor
 
-from api.utils.blob_storage import get_urls, append_prices
+import os
+import requests
+import asyncio
 
 if os.path.exists('.env'):
     load_dotenv()
@@ -25,6 +27,14 @@ def init_driver():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
+def get_market_urls(api):
+    try:
+        response = requests.get(f"{api}/market-urls")
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        return None
+    
 def extract_prices(driver, xpath):
     element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
     print(element.text)
@@ -54,28 +64,34 @@ def process_url(driver, url, tickerType):
     finally:
         driver.switch_to.default_content()
 
-def main():    
+async def main():    
 
+    executor = ThreadPoolExecutor(max_workers=5)
     driver = init_driver()
 
-    service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
-    container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
-
-    data = get_urls(container_client)
-    for _, row in data.iterrows():
-        url = row['URL']
-        ticker = row['TICKER'].lower()
-        tickerType = row['TYPE'].lower()
+    api = os.getenv("API_URL")
+    for item in get_market_urls(api):
+        ticker = item['TICKER'].lower()
+        url = item['URL']
         
-        prices = process_url(driver, url, tickerType)
-        if prices:
-            prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
+    # service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
+    # container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
+
+    # data = get_urls(container_client)
+    # for _, row in data.iterrows():
+    #     url = row['URL']
+    #     ticker = row['TICKER'].lower()
+    #     tickerType = row['TYPE'].lower()
+        
+    #     prices = process_url(driver, url, tickerType)
+    #     if prices:
+    #         prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
           
-            append_prices(container_client, ticker, tickerType, prices_list)
+    #         append_prices(container_client, ticker, tickerType, prices_list)
 
-        sleep(20)
+    #     sleep(20)
 
-    driver.quit()
+    # driver.quit()
 
 
 if __name__ == "__main__":    

@@ -15,6 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
+    
+    env:
+      AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+      SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
+      PYTHONPATH: .
 
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +32,7 @@ jobs:
           python-version: '3.12'
      
       - name: Install dependencies
-        run: pip install -r api/requirements.txt
+        run: pip install -r api/api_requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -56,6 +63,18 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9A71E3612AF945108B7C2A9A422DBFCB }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_929D80D2FF904DCF92E2AB694DCAB127 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1863D4A39F094FB38D9CC132D4995656 }}
+      
+      - name: 'Set Azure App Service Application'
+        run: |
+          az webapp config appsettings set \
+            --name market-scraper-api \
+            --resource-group YOUR_RESOURCE_GROUP \
+            --settings \
+              AZURE_CONNECTION_STRING="${AZURE_CONNECTION_STRING}" \
+              CONTAINER_NAME="${CONTAINER_NAME}" \
+              BRONZE_LOCATION="${BRONZE_LOCATION}" \
+              SILVER_LOCATION="${SILVER_LOCATION}" \
+              PYTHONPATH="."
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
