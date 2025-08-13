@@ -14,6 +14,9 @@ from azure.storage.blob import BlobServiceClient
 
 from api.utils.blob_storage import get_urls, append_prices
 
+if os.path.exists('.env'):
+    load_dotenv()
+
 def init_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless=new") 
@@ -53,8 +56,6 @@ def process_url(driver, url, tickerType):
 
 def main():    
 
-    load_dotenv()
-    
     driver = init_driver()
 
     service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
