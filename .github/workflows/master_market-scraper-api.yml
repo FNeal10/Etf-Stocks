@@ -81,7 +81,7 @@ jobs:
         with:
           app-name: 'market-scraper-api'
           slot-name: 'Production'
-          package: './api'
+          package: '.'
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
