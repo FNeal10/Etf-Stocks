@@ -68,7 +68,7 @@ jobs:
         run: |
           az webapp config appsettings set \
             --name market-scraper-api \
-            --resource-group YOUR_RESOURCE_GROUP \
+            --resource-group etfstocksmarketdata \
             --settings \
               AZURE_CONNECTION_STRING="${AZURE_CONNECTION_STRING}" \
               CONTAINER_NAME="${CONTAINER_NAME}" \
