@@ -69,7 +69,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az webapp config appsettings set --name market-scraper-api --resource-group etf-stocks-rg --settings \
+            az webapp config appsettings set --name market-scraper-api --resource-group etf-stocks --settings \
               AZURE_CONNECTION_STRING="${{ secrets.AZURE_CONNECTION_STRING }}" \
               CONTAINER_NAME="${{ secrets.CONTAINER_NAME }}" \
               BRONZE_LOCATION="${{ secrets.BRONZE_LOCATION }}" \
@@ -93,6 +93,6 @@ jobs:
         uses: azure/cli@v1
         with:
           inlineScript: |
-            az webapp config set --name market-scraper-api --resource-group etf-stocks-rg --startup-file "gunicorn --bind 0.0.0.0 --timeout 600 main:app"
+            az webapp config set --name market-scraper-api --resource-group etf-stocks --startup-file "gunicorn --bind 0.0.0.0 --timeout 600 main:app"
 
           
