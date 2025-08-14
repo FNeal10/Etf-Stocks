@@ -66,7 +66,7 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1863D4A39F094FB38D9CC132D4995656 }}
       
       - name: 'Set env variables to Azure'
-        uses: azure/cli@v1
+        uses: azure/CLI@2
         with:
           inlineScript: |
             az webapp config appsettings set --name market-scraper-api --resource-group etf-stocks-rg --settings \
