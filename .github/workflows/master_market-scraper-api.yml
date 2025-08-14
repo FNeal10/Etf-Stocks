@@ -75,6 +75,7 @@ jobs:
           SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
         with:
           inlineScript: |
+            echo "AZURE_CONNECTION_STRING=$AZURE_CONNECTION_STRING"
             az webapp config appsettings set --name market-scraper-api --resource-group etf-stocks --settings \
               AZURE_CONNECTION_STRING="${AZURE_CONNECTION_STRING}" \
               CONTAINER_NAME="${CONTAINER_NAME}" \
