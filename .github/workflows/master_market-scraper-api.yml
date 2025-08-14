@@ -1,8 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-name: Build and deploy Python app to Azure Web App - market-scraper-api
+name: Build and deploy Python API to Azure Web App
 
 on:
   push:
@@ -13,62 +9,62 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
     
-    env:
-      AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
-      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-      BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
-      SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
-      PYTHONPATH: .
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python version
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-     
+
       - name: Install dependencies
         run: pip install -r api/api_requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
-          path: |
-            .
-            !venv/
+          name: python-api
+          path: ./api
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact from build
         uses: actions/download-artifact@v4
         with:
-          name: python-app
-      
+          name: python-api
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9A71E3612AF945108B7C2A9A422DBFCB }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_929D80D2FF904DCF92E2AB694DCAB127 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1863D4A39F094FB38D9CC132D4995656 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: 'Set up env variables in Azure'
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az webapp config appsettings set \
+            --name market-scraper-api \
+            --resource-group etf-stocks \
+            --settings "AZURE_CONNECTION_STRING=${{ secrets.AZURE_CONNECTION_STRING }}" \
+            "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" \
+            "BRONZE_LOCATION=${{ secrets.BRONZE_LOCATION }}" \
+            "SILVER_LOCATION=${{ secrets.SILVER_LOCATION }}"
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'market-scraper-api'
           slot-name: 'Production'
+          package: './api'
 
-          
+      - name: Set Startup Command
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az webapp config set --name market-scraper-api --resource-group etf-stocks --startup-file "gunicorn --bind 0.0.0.0 --timeout 600 main:app"
