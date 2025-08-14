@@ -57,7 +57,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
+          path: api
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -67,13 +68,18 @@ jobs:
       
       - name: 'Set env variables to Azure'
         uses: azure/CLI@v1
+        env:
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
         with:
           inlineScript: |
             az webapp config appsettings set --name market-scraper-api --resource-group etf-stocks --settings \
-              AZURE_CONNECTION_STRING="${{ secrets.AZURE_CONNECTION_STRING }}" \
-              CONTAINER_NAME="${{ secrets.CONTAINER_NAME }}" \
-              BRONZE_LOCATION="${{ secrets.BRONZE_LOCATION }}" \
-              SILVER_LOCATION="${{ secrets.SILVER_LOCATION }}"
+              AZURE_CONNECTION_STRING="$AZURE_CONNECTION_STRING" \
+              CONTAINER_NAME="$CONTAINER_NAME" \
+              BRONZE_LOCATION="$BRONZE_LOCATION" \
+              SILVER_LOCATION="$SILVER_LOCATION"
         
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -81,13 +87,8 @@ jobs:
         with:
           app-name: 'market-scraper-api'
           slot-name: 'Production'
-          package: '.'
-        env:
-          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
-          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
-          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
-          PYTHONPATH: './api'
+          package: './api'
+        
 
       - name: 'Set startup command'
         uses: azure/cli@v1
