@@ -76,10 +76,10 @@ jobs:
         with:
           inlineScript: |
             az webapp config appsettings set --name market-scraper-api --resource-group etf-stocks --settings \
-              AZURE_CONNECTION_STRING="$AZURE_CONNECTION_STRING" \
-              CONTAINER_NAME="$CONTAINER_NAME" \
-              BRONZE_LOCATION="$BRONZE_LOCATION" \
-              SILVER_LOCATION="$SILVER_LOCATION"
+              AZURE_CONNECTION_STRING="${{AZURE_CONNECTION_STRING}}" \
+              CONTAINER_NAME="${{CONTAINER_NAME}}" \
+              BRONZE_LOCATION="${{BRONZE_LOCATION}}" \
+              SILVER_LOCATION="${{SILVER_LOCATION}}"
         
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
