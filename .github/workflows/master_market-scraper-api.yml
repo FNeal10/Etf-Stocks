@@ -21,7 +21,7 @@ jobs:
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
       BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
       SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
-      PYTHONPATH: .
+      PYTHONPATH: ./api
 
     steps:
       - uses: actions/checkout@v4
@@ -41,8 +41,9 @@ jobs:
         with:
           name: python-app
           path: |
-            .
-            !venv/
+            ./api
+            !api/venv/
+            !api/.env
 
   deploy:
     runs-on: ubuntu-latest
@@ -80,7 +81,14 @@ jobs:
         with:
           app-name: 'market-scraper-api'
           slot-name: 'Production'
-      
+          package: './api'
+        env:
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
+          PYTHONPATH: './api'
+
       - name: 'Set startup command'
         uses: azure/cli@v1
         with:
