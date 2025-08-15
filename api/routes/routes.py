@@ -4,6 +4,10 @@ from ..utils.blob_storage import *
 
 api_routes = Blueprint('api_routes', __name__)
 
+@api_routes.route('/')
+def index():
+    return jsonify({"message": "Welcome to the Market Scraper API"}), 200
+
 
 @api_routes.route('/market-urls', methods=['GET'])
 def market_urls():
