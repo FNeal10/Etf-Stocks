@@ -8,7 +8,8 @@ from datetime import datetime
 import pandas as pd
 import os
 
-load_dotenv()
+if os.path.exists('.env'):
+    load_dotenv()
 
 service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
 container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))

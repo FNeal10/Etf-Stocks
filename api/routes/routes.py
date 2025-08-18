@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, Response
-from ..utils.blob_storage import *
+from utils.blob_storage import *
 
 
 api_routes = Blueprint('api_routes', __name__)

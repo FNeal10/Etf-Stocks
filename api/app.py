@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
-from api.routes.routes import api_routes
+from routes.routes import api_routes
 
 
 if os.path.exists('.env'):
