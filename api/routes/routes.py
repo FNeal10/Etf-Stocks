@@ -8,6 +8,14 @@ api_routes = Blueprint('api_routes', __name__)
 def index():
     return jsonify({"message": "Welcome to the Market Scraper API"}), 200
 
+@api_routes.route('/env', methods=['GET'])
+def show_env():
+    return jsonify({
+        "AZURE_CONNECTION_STRING": os.getenv("AZURE_CONNECTION_STRING"),
+        "BRONZE_LOCATION": os.getenv("BRONZE_LOCATION"),
+        "SILVER_LOCATION": os.getenv("SILVER_LOCATION")
+    }) 
+
 
 @api_routes.route('/market-urls', methods=['GET'])
 def market_urls():
@@ -32,8 +40,8 @@ def append_ohclv():
         return jsonify({"error": str(e)}), 500
     
 
-@api_routes.route('/get-bronze-files', methods=['POST'])
-def get_bronze_files():
+@api_routes.route('/get-bronze', methods=['POST'])
+def get_bronze():
     try:
         bronze_files = get_bronze_files()
         return jsonify(bronze_files), 200
