@@ -48,3 +48,8 @@ jobs:
                 os-type: Linux
                 ports: ${{ secrets.API_PORT }}
                 restart-policy: OnFailure
+                environment-variables: |
+                  AZURE_CONNECTION_STRING=${{ secrets.AZURE_CONNECTION_STRING }}
+                  CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}
+                  BRONZE_LOCATION=${{ secrets.BRONZE_LOCATION }}
+                  SILVER_LOCATION=${{ secrets.SILVER_LOCATION }}
