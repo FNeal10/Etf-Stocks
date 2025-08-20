@@ -44,6 +44,7 @@ jobs:
                 registry-login-server: ${{ secrets.ACR_NAME }}
                 registry-username: ${{ secrets.ACR_USERNAME }}
                 registry-password: ${{ secrets.ACR_PASSWORD }}
+                dns-name-label: ${{ secrets.DNS_NAME_LABEL }}
                 os-type: Linux
-                ports: 5000
+                ports: ${{ secrets.API_PORT }}
                 restart-policy: OnFailure
