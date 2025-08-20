@@ -1,6 +1,12 @@
 name: Run scraper
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - '*'
+      - '!api/**'
   workflow_dispatch:
   schedule:
     - cron: '0 13 * * 1-5'  
