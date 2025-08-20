@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, render_template
 from utils.blob_storage import *
 
 
@@ -6,15 +6,7 @@ api_routes = Blueprint('api_routes', __name__)
 
 @api_routes.route('/')
 def index():
-    return jsonify({"message": "Welcome to the Market Scraper API"}), 200
-
-@api_routes.route('/env', methods=['GET'])
-def show_env():
-    return jsonify({
-        "AZURE_CONNECTION_STRING": os.getenv("AZURE_CONNECTION_STRING"),
-        "BRONZE_LOCATION": os.getenv("BRONZE_LOCATION"),
-        "SILVER_LOCATION": os.getenv("SILVER_LOCATION")
-    }) 
+    return render_template('about.html')
 
 
 @api_routes.route('/market-urls', methods=['GET'])
