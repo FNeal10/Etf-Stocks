@@ -22,7 +22,7 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t ${{ secrets.ACR_NAME }}/${{ secrets.IMAGE_NAME }}:latest .
+                docker build --no-cache -f ./api/Dockerfile ${{ secrets.ACR_NAME }}/${{ secrets.IMAGE_NAME }}:latest ./api
             
             - name: Push Docker image
               run: |
