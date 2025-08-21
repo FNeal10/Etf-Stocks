@@ -10,6 +10,7 @@ on:
 
 jobs:
   start-aci:
+    if: github.event.schedule == '50 12 * * 1-5'
     runs-on: ubuntu-latest
     steps:
       - name: Log in to Azure
@@ -24,7 +25,6 @@ jobs:
             --name ${{ secrets.ACI_NAME }}
 
   stop-aci:
-    if: github.event.schedule == '20 13 * * 1-5'
     runs-on: ubuntu-latest
     steps:
       - name: Log in to Azure
