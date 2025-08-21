@@ -69,10 +69,14 @@ async def main():
     executor = ThreadPoolExecutor(max_workers=5)
     driver = init_driver()
 
-    api = os.getenv("API_URL")
-    for item in get_market_urls(api):
+    api = f"{os.getenv("API_URL")}:{os.getenv("API_PORT")}"
+    market_urls = get_market_urls(api)
+
+    for item in market_urls.iterrows():
         ticker = item['TICKER'].lower()
         url = item['URL']
+        
+
         
     # service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
     # container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))

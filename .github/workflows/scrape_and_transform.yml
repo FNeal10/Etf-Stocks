@@ -7,18 +7,16 @@ on:
     paths:
       - '*'
       - '!api/**'
-  workflow_dispatch:
-  schedule:
-    - cron: '0 13 * * 1-5'  
+  workflow_dispatch:  
+  workflow_call:      
 
 jobs:
-  run:
+  run-scraper:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3   
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -26,19 +24,10 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-                            
+                          
       - name: Run scraper to get the latest stock prices
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
-      
-      - name: Run silver transformation script
-        env:
-          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
-          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
-          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
-          PYTHONPATH: .
-        run: python scripts/run_silver.py

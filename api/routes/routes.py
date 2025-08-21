@@ -21,7 +21,7 @@ def market_urls():
 @api_routes.route('/append-ohclv', methods=['POST'])
 def append_ohclv():
     try:
-        params = request.json()
+        params = request.get_json()
         ticker_name = params.get("ticker_name")
         market_data = params.get("market_data")
 

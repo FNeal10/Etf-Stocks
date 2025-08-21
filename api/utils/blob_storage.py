@@ -90,7 +90,7 @@ def get_file_data(file_name):
 def create_silver_file(silver_file):
     """
     Creates a silver file from the provided parquet file.
-    :param parquet_file: Parquet file data.
+    :param silver_file: Silver file data.
     :return: None
     """
     blob_name = f"{silver_path}{datetime.now().strftime('%Y-%m%d')}.csv"

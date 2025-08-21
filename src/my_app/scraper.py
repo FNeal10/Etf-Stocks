@@ -1,6 +1,8 @@
 from datetime import datetime
 from time import sleep
+
 import os
+import requests
 
 from dotenv import load_dotenv
 from selenium import webdriver  
@@ -10,9 +12,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from azure.storage.blob import BlobServiceClient
 
-from api.utils.blob_storage import get_urls, append_prices
+
+if os.path.exists('.env'):
+    load_dotenv()
 
 def init_driver():
     chrome_options = Options()
@@ -22,9 +25,32 @@ def init_driver():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
+def get_market_urls(api):
+    try:
+        response = requests.get(f"{api}market-urls")
+        response.raise_for_status()
+        print( response.json())
+        return response.json()
+    except Exception as e:
+        return None
+
+def append_ohclv(api, tickerName, marketData):
+    payload = {
+        "ticker_name": tickerName,
+        "market_data": marketData
+    }
+    try:
+        response = requests.post(f"{api}append-ohclv", json=payload)
+        response.raise_for_status()
+        print(response.json())
+        return response.json()
+    except Exception as e:
+        print(f"Error appending OHLCV data for {tickerName}: {e}")
+        return None
+
+
 def extract_prices(driver, xpath):
     element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
-    print(element.text)
     return element.text.replace('"','').strip()
 
 def process_url(driver, url, tickerType):
@@ -52,25 +78,27 @@ def process_url(driver, url, tickerType):
         driver.switch_to.default_content()
 
 def main():    
-
-    load_dotenv()
     
     driver = init_driver()
+    api = f"{os.getenv('API_URL')}:{os.getenv('API_PORT')}/"
 
-    service_client = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
-    container_client = service_client.get_container_client(os.getenv("CONTAINER_NAME"))
+    data = get_market_urls(api)
+    if not data:
+        print("Failed to retrieve market URLs.")
+        return
+    
+    for row in data:
 
-    data = get_urls(container_client)
-    for _, row in data.iterrows():
         url = row['URL']
         ticker = row['TICKER'].lower()
         tickerType = row['TYPE'].lower()
         
+        print(f"Processing {ticker}")
+        
         prices = process_url(driver, url, tickerType)
         if prices:
             prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
-          
-            append_prices(container_client, ticker, tickerType, prices_list)
+            append_ohclv(api, ticker, prices_list)  
 
         sleep(20)
 

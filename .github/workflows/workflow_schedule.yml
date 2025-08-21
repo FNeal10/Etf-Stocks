@@ -1,0 +1,22 @@
+name: Parent workflow
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 13 * * 1-5'
+
+jobs:
+  start-aci:
+    uses: ./.github/workflows/start_stop_aci.yml
+    with:
+      action: 'start'
+
+  scrape-and-transform:
+    needs: start-aci
+    uses: ./.github/workflows/scrape_and_transform.yml
+ 
+  stop-aci:
+    needs: scrape-and-transform
+    uses: ./.github/workflows/start_stop_aci.yml
+    with:
+      action: 'stop'

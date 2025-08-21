@@ -2,15 +2,16 @@ name: Schedule to start / stop Azure Container Instance
 
 on:
   workflow_dispatch:
-  schedule:
-    # Start at 8:50 AM UTC (weekdays)
-    - cron: '50 12 * * 1-5'
-    # Stop at 9:20 AM UTC (weekdays)
-    - cron: '20 13 * * 1-5'
+  workflow_call: 
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'start'
+        type: string
 
 jobs:
-  start-aci:
-    if: github.event.schedule == '50 12 * * 1-5'
+  manage-aci:
     runs-on: ubuntu-latest
     steps:
       - name: Log in to Azure
@@ -18,22 +19,14 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Start container
+      - name: start or stop aci
         run: |
-          az container start \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.ACI_NAME }}
-
-  stop-aci:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log in to Azure
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Stop container
-        run: |
-          az container stop \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.ACI_NAME }}
+          if [ "${{ inputs.action }}" == "start" ]; then
+            az container start \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --name ${{ secrets.ACI_NAME }}
+          else
+            az container stop \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --name ${{ secrets.ACI_NAME }}
+          fi
