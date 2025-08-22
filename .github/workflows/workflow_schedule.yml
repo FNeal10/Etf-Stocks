@@ -14,14 +14,32 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       ACI_NAME: ${{ secrets.ACI_NAME }}
+  
+  wait-for-api-to-load:
+    needs: start-aci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for API to load
+        run: |
+          echo "Sleep 10 minutes for API to load"
+          sleep 600
 
   scrape-and-transform:
-    needs: start-aci
+    needs: wait-for-api-to-load
     uses: ./.github/workflows/scrape_and_transform.yml
     secrets:
       AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
- 
+
+  wait-to-actual-stop-aci:
+    needs: scrape-and-transform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for 5 min
+        run: |
+          echo "Sleep 5 minutes before stopping"
+          sleep 300
+
   stop-aci:
     needs: scrape-and-transform
     uses: ./.github/workflows/start_stop_aci.yml
