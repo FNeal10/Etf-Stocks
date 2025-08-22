@@ -1,12 +1,16 @@
 import os
 import sys
 import pandas as pd
+import requests
 
 from io import StringIO
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
 
-from src.utils.helper import format_to_decimal, check_or_create_logfile, append_to_log
+from src.utils.helper import format_to_decimal
+
+if os.path.exists('.env'):
+    load_dotenv()
 
 def clean_data(df):
     df["Volume"] = df["Volume"].str.replace(',','').replace("'","").replace(".","").astype(int)
@@ -71,31 +75,26 @@ def append_latest_to_silver(df, serviceClient, containerName, blobName):
 
 def main():
 
-    load_dotenv()
+    
 
-    combinedData = pd.DataFrame() # STAGING DATAFAME TO HANDLE FILES
-    serviceClient = BlobServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
-    blobContainer = serviceClient.get_container_client(os.getenv("CONTAINER_NAME"))
+    #combinedData = pd.DataFrame() # STAGING DATAFAME TO HANDLE FILES
 
-    bronzeLocation = os.getenv("BRONZE_LOCATION")
-    silverFile = os.getenv("SILVER_LOCATION")
+    # for blob in blobContainer.list_blobs(name_starts_with=f"{bronzeLocation}"):
 
-    for blob in blobContainer.list_blobs(name_starts_with=f"{bronzeLocation}"):
+    #     blob_client = blobContainer.get_blob_client(blob.name)
+    #     stockPrices = blob_client.download_blob().readall().decode('utf-8')
 
-        blob_client = blobContainer.get_blob_client(blob.name)
-        stockPrices = blob_client.download_blob().readall().decode('utf-8')
+    #     data = pd.read_csv(StringIO(stockPrices), keep_default_na=True, parse_dates=["Date"])
 
-        data = pd.read_csv(StringIO(stockPrices), keep_default_na=True, parse_dates=["Date"])
+    #     data = data.head(1)
+    #     data = clean_data(data)
+    #     data = add_features(data, os.path.basename(blob.name).replace('.csv',''))
 
-        data = data.head(1)
-        data = clean_data(data)
-        data = add_features(data, os.path.basename(blob.name).replace('.csv',''))
+    #     combinedData = pd.concat([combinedData, data], ignore_index=True)
 
-        combinedData = pd.concat([combinedData, data], ignore_index=True)
-
-    #upload_silver_to_blob(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
-    append_latest_to_silver(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
-    return combinedData, data
+    # #upload_silver_to_blob(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
+    # append_latest_to_silver(combinedData, serviceClient, os.getenv("CONTAINER_NAME"), f"{silverFile}silver_output.csv")
+    # return combinedData, data
 
 if __name__ == "__main__":
     main()
