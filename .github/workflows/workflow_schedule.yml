@@ -41,7 +41,7 @@ jobs:
           sleep 300
 
   stop-aci:
-    needs: scrape-and-transform
+    needs: wait-to-actual-stop-aci
     uses: ./.github/workflows/start_stop_aci.yml
     with:
       action: 'stop'
