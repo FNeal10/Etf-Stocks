@@ -9,6 +9,16 @@ on:
         required: true
         default: 'start'
         type: string
+    secrets:
+      AZURE_CREDENTIALS:
+        description: 'Azure credentials'
+        required: true
+      AZURE_RESOURCE_GROUP:
+        description: 'Azure resource group'
+        required: true
+      ACI_NAME:
+        description: 'Azure Container Instance name'
+        required: true
 
 jobs:
   manage-aci:
