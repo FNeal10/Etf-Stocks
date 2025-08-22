@@ -22,6 +22,8 @@ def init_driver():
     chrome_options.add_argument("--headless=new") 
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080") 
+    chrome_options.add_argument("--log-level=3")  # Only fatal logs
+    chrome_options.add_argument("--disable-logging")  # Extra suppression
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
@@ -29,7 +31,6 @@ def get_market_urls(api):
     try:
         response = requests.get(f"{api}market-urls")
         response.raise_for_status()
-        print( response.json())
         return response.json()
     except Exception as e:
         return None
@@ -42,7 +43,6 @@ def append_ohclv(api, tickerName, marketData):
     try:
         response = requests.post(f"{api}append-ohclv", json=payload)
         response.raise_for_status()
-        print(response.json())
         return response.json()
     except Exception as e:
         print(f"Error appending OHLCV data for {tickerName}: {e}")
@@ -53,7 +53,7 @@ def extract_prices(driver, xpath):
     element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath)))
     return element.text.replace('"','').strip()
 
-def process_url(driver, url, tickerType):
+def process_url(driver, url, tickerType, ticker):
     current_price = {}
     try:
         if tickerType == "stocks":
@@ -68,7 +68,7 @@ def process_url(driver, url, tickerType):
                 "close": extract_prices(driver,"/html/body/div/div/div/div[3]/div[1]/div/div[3]/table/tbody/tr[1]/td[6]"),
                 "volume": extract_prices(driver,"/html/body/div/div/div/div[3]/div[1]/div/div[3]/table/tbody/tr[3]/td[2]")
             }
-        
+        print(f"Scraping successful for {ticker}")
         return current_price
     
     except Exception as e:
@@ -76,33 +76,34 @@ def process_url(driver, url, tickerType):
         return None
     finally:
         driver.switch_to.default_content()
+        pass
 
 def main():    
-    
-    driver = init_driver()
     api = f"{os.getenv('API_URL')}:{os.getenv('API_PORT')}/"
-
     data = get_market_urls(api)
     if not data:
         print("Failed to retrieve market URLs.")
         return
     
     for row in data:
-
         url = row['URL']
         ticker = row['TICKER'].lower()
         tickerType = row['TYPE'].lower()
         
         print(f"Processing {ticker}")
+
+        driver = init_driver()
+        try:
+            prices = process_url(driver, url, tickerType, ticker)
+            if prices:
+                prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
+                append_ohclv(api, ticker, prices_list)  
+        except Exception as e:
+            print(f"Error scraping for {ticker}: {e}")
+        finally:
+            driver.quit()
         
-        prices = process_url(driver, url, tickerType)
-        if prices:
-            prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
-            append_ohclv(api, ticker, prices_list)  
-
-        sleep(20)
-
-    driver.quit()
+        sleep(10)
 
 
 if __name__ == "__main__":    
