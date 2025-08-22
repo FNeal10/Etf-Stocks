@@ -2,7 +2,14 @@ name: Run scraper
 
 on:
   workflow_dispatch:  
-  workflow_call:      
+  workflow_call:   
+    secrets:
+      AZURE_CONNECTION_STRING:
+        description: 'Azure Storage connection string'
+        required: true
+      CONTAINER_NAME:
+        description: 'Azure Storage container name'
+        required: true   
 
 jobs:
   run-scraper:

@@ -19,6 +19,7 @@ on:
       ACI_NAME:
         description: 'Azure Container Instance name'
         required: true
+      
 
 jobs:
   manage-aci:
