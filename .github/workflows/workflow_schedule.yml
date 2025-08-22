@@ -10,13 +10,24 @@ jobs:
     uses: ./.github/workflows/start_stop_aci.yml
     with:
       action: 'start'
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      ACI_NAME: ${{ secrets.ACI_NAME }}
 
   scrape-and-transform:
     needs: start-aci
     uses: ./.github/workflows/scrape_and_transform.yml
+    secrets:
+      AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
  
   stop-aci:
     needs: scrape-and-transform
     uses: ./.github/workflows/start_stop_aci.yml
     with:
       action: 'stop'
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+      ACI_NAME: ${{ secrets.ACI_NAME }}
