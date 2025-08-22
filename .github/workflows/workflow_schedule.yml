@@ -30,6 +30,8 @@ jobs:
     secrets:
       AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      API_URL: ${{ secrets.API_URL }}
+      API_PORT: ${{ secrets.API_PORT }}
 
   wait-to-actual-stop-aci:
     needs: scrape-and-transform

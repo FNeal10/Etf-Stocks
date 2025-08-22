@@ -10,6 +10,12 @@ on:
       CONTAINER_NAME:
         description: 'Azure Storage container name'
         required: true   
+      API_URL:
+        description: 'API URL'
+        required: true
+      API_PORT:
+        description: 'API Port'
+        required: true
 
 jobs:
   run-scraper:
@@ -30,5 +36,7 @@ jobs:
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          API_URL: ${{ secrets.API_URL }}
+          API_PORT: ${{ secrets.API_PORT }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
