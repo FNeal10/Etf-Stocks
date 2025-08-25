@@ -29,8 +29,7 @@ def append_ohclv():
 
         return jsonify({"message": "OHLCV data appended successfully"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
+        return jsonify({"error": str(e)}), 500    
 
 @api_routes.route('/get-bronze', methods=['POST'])
 def get_bronze():
@@ -38,8 +37,7 @@ def get_bronze():
         bronze_files = get_bronze_files()
         return jsonify(bronze_files), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
+        return jsonify({"error": str(e)}), 500    
 
 @api_routes.route('/get-file', methods=['POST'])
 def get_file():

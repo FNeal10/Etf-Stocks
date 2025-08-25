@@ -23,21 +23,11 @@ def clean_data(df):
     df["Low"] = df["Low"].apply(format_to_decimal).astype(float)
     return df
 
-def add_features(df: pd.DataFrame, source: str):
-
-    import pandas as pd
-import numpy as np
-
 def add_features(df, source=None):
-    # Ensure Date column is datetime
-    df["Date"] = pd.to_datetime(df["Date"])
 
     # Sort by date
     df = df.sort_values(by="Date").reset_index(drop=True)
-
-    # Insert source if provided
-    if source is not None:
-        df.insert(0, "Source", source)
+    df.insert(0, "Source", source)
 
     # ------------------- Date/Time Features -------------------
     df['Year'] = df['Date'].dt.year
@@ -85,9 +75,11 @@ def add_features(df, source=None):
     # True Range
     df['TR'] = np.maximum(df['High'] - df['Low'], 
                           np.maximum(abs(df['High'] - df['Close'].shift()), abs(df['Low'] - df['Close'].shift())))
+    
     # Directional Movement
     df['+DM'] = df['High'].diff().clip(lower=0)
     df['-DM'] = -df['Low'].diff().clip(upper=0)
+
     # Smooth
     tr14 = df['TR'].rolling(14).sum()
     plus_dm14 = df['+DM'].rolling(14).sum()
@@ -97,8 +89,7 @@ def add_features(df, source=None):
     df['ADX'] = abs(df['PlusDI'] - df['MinusDI']).rolling(14).mean()
 
     # ------------------- Parabolic SAR -------------------
-    # Simple implementation (placeholder, can use ta library for accurate SAR)
-    df['SAR'] = df['Close'].rolling(2).mean()  # replace with real SAR if needed
+    df['SAR'] = df['Close'].rolling(2).mean()  
 
     # ------------------- Volume -------------------
     df['Volume_20'] = df['Volume'].rolling(20).mean()
@@ -126,9 +117,8 @@ def add_features(df, source=None):
 def get_bronze_files(api):
     try:
         response = requests.post(f"{api}get-bronze")
-        print(response.status_code)
-        if response.status_code == 200:
-            return response.json()
+        response.raise_for_status()
+        return response.json()
     except Exception as e:
         print(f"Error fetching bronze files: {e}")
         return []
@@ -137,19 +127,24 @@ def get_data_contents(api, file_name):
     payload = {
         "file": file_name
     }
-    response = requests.post(f"{api}get-file", json=payload)
-    if response.status_code == 200:
+    try:
+        response = requests.post(f"{api}get-file", json=payload)
+        response.raise_for_status()
         return pd.read_csv(StringIO(response.text))
-    return []
+    except Exception as e:
+        print(f"Error fetching data contents: {e}")
+        return []
 
 def upload_silver(api, df):
-    print("Uploading silver file")
-    headers = {"Content-Type": "application/octet-stream"}
-    buffer = BytesIO()
-    df.to_csv(buffer, index=False)
-    buffer.seek(0)
-    response = requests.post(f"{api}/create-silver", data=buffer.getvalue(), headers=headers)
-    print(response.status_code)
+    try:
+        headers = {"Content-Type": "application/octet-stream"}
+        buffer = BytesIO()
+        df.to_csv(buffer, index=False)
+        buffer.seek(0)
+        response = requests.post(f"{api}/create-silver", data=buffer.getvalue(), headers=headers)
+        response.raise_for_status()
+    except Exception as e:
+        print(f"Error uploading silver file: {e}")
 
 def main():
     market_df_list = []
