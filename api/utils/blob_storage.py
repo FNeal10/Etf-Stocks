@@ -1,5 +1,5 @@
 
-from io import BytesIO
+from io import BytesIO, StringIO
 from azure.storage.blob import BlobServiceClient
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
 from dotenv import load_dotenv
@@ -93,7 +93,7 @@ def create_silver_file(silver_file):
     :param silver_file: Silver file data.
     :return: None
     """
-    blob_name = f"{silver_path}{datetime.now().strftime('%Y-%m%d')}.csv"
+    blob_name = f"{silver_path}{datetime.now().strftime('%Y-%m-%d')}.csv"
     blob_client = container_client.get_blob_client(blob=blob_name)
 
     try:

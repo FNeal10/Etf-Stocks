@@ -40,3 +40,12 @@ jobs:
           API_PORT: ${{ secrets.API_PORT }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
+
+      - name: Run Silver transformation
+        env:
+          AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+          API_URL: ${{ secrets.API_URL }}
+          API_PORT: ${{ secrets.API_PORT }}
+          PYTHONPATH: .
+        run: python scripts/run_silver.py
