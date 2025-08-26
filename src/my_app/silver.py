@@ -135,33 +135,31 @@ def get_data_contents(api, file_name):
         print(f"Error fetching data contents: {e}")
         return pd.DataFrame()
 
-def upload_silver(api, df):
+def upload_silver(api, df, ticker):
     try:
-        headers = {"Content-Type": "application/octet-stream"}
-        buffer = BytesIO()
-        df.to_csv(buffer, index=False)
-        buffer.seek(0)
-        response = requests.post(f"{api}/create-silver", data=buffer.getvalue(), headers=headers)
+        payload = {
+            "file": df.to_csv(index=False),
+            "ticker": ticker
+        }
+        response = requests.post(f"{api}/create-silver", json=payload)
         response.raise_for_status()
     except Exception as e:
         print(f"Error uploading silver file: {e}")
 
 def main():
-    market_df_list = []
     api = f"{os.getenv('API_URL')}:{os.getenv('API_PORT')}/"
 
     print(f"Getting bronze files...")
     bronze_data = get_bronze_files(api)
     if bronze_data:
         for data in bronze_data:
+            tickername = data.replace(".csv","").replace("bronze/","")
             print(f"Processing {data}...")
             contents = get_data_contents(api, data.replace("bronze/",""))
             if not contents.empty:
                 df_cleaned = clean_data(contents)
-                df_cleaned = add_features(df_cleaned, data.replace(".csv","").replace("bronze/",""))
-                market_df_list.append(df_cleaned)
-        market_df = pd.concat(market_df_list, ignore_index=True)
-        upload_silver(api, market_df)
+                df_cleaned = add_features(df_cleaned, tickername)
+                upload_silver(api, df_cleaned, tickername)
     else:
         pass
 

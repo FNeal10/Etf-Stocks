@@ -87,13 +87,14 @@ def get_file_data(file_name):
     except Exception as e:
         return None
 
-def create_silver_file(silver_file):
+def create_silver_file(silver_file, ticker):
     """
-    Creates a silver file from the provided parquet file.
+    Creates a silver file from the provided csv file.
     :param silver_file: Silver file data.
+    :param ticker: Desired ticker for the silver file.
     :return: None
     """
-    blob_name = f"{silver_path}{datetime.now().strftime('%Y-%m-%d')}.csv"
+    blob_name = f"{silver_path}{ticker}/{datetime.now().strftime('%Y-%m-%d')}.csv"
     blob_client = container_client.get_blob_client(blob=blob_name)
 
     try:

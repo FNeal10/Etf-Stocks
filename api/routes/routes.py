@@ -56,8 +56,11 @@ def get_file():
 @api_routes.route('/create-silver', methods=['POST'])
 def create_silver():
     try:
-       silver_file = request.get_data()
-       result = create_silver_file(silver_file)
-       return jsonify(result), 201 if result.get("is_success") else 400
+        params = request.get_json()
+        ticker = params.get("ticker")
+        silver_file = params.get("data")
+       
+        result = create_silver_file(silver_file, ticker)
+        return jsonify(result), 201 if result.get("is_success") else 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
