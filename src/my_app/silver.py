@@ -1,12 +1,12 @@
 import os
 import sys
 import pandas as pd
+
 import requests
-import datetime
+import numpy as np
 
 from io import StringIO, BytesIO
 from dotenv import load_dotenv
-from azure.storage.blob import BlobServiceClient
 
 from src.utils.helper import format_to_decimal
 
@@ -14,13 +14,13 @@ if os.path.exists('.env'):
     load_dotenv()
 
 def clean_data(df):
-    df["Volume"] = df["Volume"].str.replace(',','').replace("'","").replace(".","").astype(int)
     df["Date"] = pd.to_datetime(df["Date"], format='%m/%d/%Y')
 
     df["Open"] = df["Open"].apply(format_to_decimal).astype(float)
     df["High"] = df["High"].apply(format_to_decimal).astype(float)
     df["Close"] = df["Close"].apply(format_to_decimal).astype(float)
     df["Low"] = df["Low"].apply(format_to_decimal).astype(float)
+    df["Volume"] = df["Volume"].str.replace(r'\D', '', regex=True).astype(int)
     return df
 
 def add_features(df, source=None):
@@ -133,7 +133,7 @@ def get_data_contents(api, file_name):
         return pd.read_csv(StringIO(response.text))
     except Exception as e:
         print(f"Error fetching data contents: {e}")
-        return []
+        return pd.DataFrame()
 
 def upload_silver(api, df):
     try:
