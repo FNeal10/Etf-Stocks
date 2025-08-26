@@ -33,17 +33,9 @@ jobs:
       API_URL: ${{ secrets.API_URL }}
       API_PORT: ${{ secrets.API_PORT }}
 
-  wait-to-actual-stop-aci:
-    needs: scrape-and-transform
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for 5 min
-        run: |
-          echo "Sleep 5 minutes before stopping"
-          sleep 300
-
   stop-aci:
-    needs: wait-to-actual-stop-aci
+    if: always()
+    needs: scrape-and-transform
     uses: ./.github/workflows/start_stop_aci.yml
     with:
       action: 'stop'
