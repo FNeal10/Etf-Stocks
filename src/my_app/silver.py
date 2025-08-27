@@ -14,7 +14,7 @@ if os.path.exists('.env'):
     load_dotenv()
 
 def clean_data(df):
-    df["Date"] = pd.to_datetime(df["Date"], format='%m/%d/%Y')
+    df["Date"] = pd.to_datetime(df["Date"].str.strip(), format='%m/%d/%Y')
 
     df["Open"] = df["Open"].apply(format_to_decimal).astype(float)
     df["High"] = df["High"].apply(format_to_decimal).astype(float)
@@ -138,7 +138,7 @@ def get_data_contents(api, file_name):
 def upload_silver(api, df, ticker):
     try:
         payload = {
-            "file": df.to_csv(index=False),
+            "data": df.to_csv(index=False),
             "ticker": ticker
         }
         response = requests.post(f"{api}/create-silver", json=payload)

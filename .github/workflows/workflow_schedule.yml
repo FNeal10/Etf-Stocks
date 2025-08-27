@@ -21,8 +21,8 @@ jobs:
     steps:
       - name: Wait for API to load
         run: |
-          echo "Sleep 5 minutes for API to load"
-          sleep 300
+          echo "Sleep 10 minutes for API to load"
+          sleep 600
 
   scrape-and-transform:
     needs: wait-for-api-to-load
