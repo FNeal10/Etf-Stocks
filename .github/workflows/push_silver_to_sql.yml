@@ -1,6 +1,17 @@
 name: Trigger ADF Pipeline
 on:
   workflow_dispatch:
+  workflow_call:   
+    secrets:
+      ADF_NAME:
+        description: 'Azure Data Factory Name'
+        required: true   
+      AZURE_RESOURCE_GROUP:
+        description: 'Azure Resource Group Name'
+        required: true
+      ADF_PIPELINE_NAME:
+        description: 'Azure Pipeline Name'
+        required: true
 
 jobs:
   trigger_adf_pipeline:
