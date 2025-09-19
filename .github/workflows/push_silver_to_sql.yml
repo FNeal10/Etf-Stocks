@@ -1,0 +1,22 @@
+name: Trigger ADF Pipeline
+on:
+  workflow_dispatch:
+
+jobs:
+  trigger_adf_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Trigger ADF Pipeline
+        run: |
+          az datafactory pipeline create-run \
+            --factory-name ${{ secrets.ADF_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.ADF_PIPELINE_NAME }} 
