@@ -94,7 +94,3 @@ graph TD
 ```
 
 ---
-
-## License
-
-This project is distributed under the MIT License. See [`LICENSE`](LICENSE.md) for details.
