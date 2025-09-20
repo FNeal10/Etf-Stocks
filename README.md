@@ -6,12 +6,11 @@ A Python scraper that collects stock market prices from a list of URLs, transfor
 
 ## ✨ Features
 
-- 🕵️‍♂️ Scrapes stock prices for tracked stocks  
-- ⏰ Runs automatically **Monday to Friday at 9 AM**  
-- ⚡ Uses **Selenium** for dynamic web scraping  
+- 🕵️‍♂️ Scrapes stock prices for tracked stocks using **Python** and **Selenium**   
+- ⏰ Runs automatically **Monday to Friday at 9 AM**
 - 🔄 Fully automated **CI/CD pipeline** with Docker and GitHub Actions  
 - ☁️ Runs on **ACI** with containerized Python workflow  
-- 🗄 Transforms data and **upserts into Azure SQL Database via ADF**  
+- 🗄 Transforms data and add features before **upserting into Azure SQL Database via ADF**  
 
 ---
 
@@ -19,15 +18,12 @@ A Python scraper that collects stock market prices from a list of URLs, transfor
 
 ```mermaid
 graph TD
-    subgraph CI/CD
-        A[GitHub Actions CI/CD] --> B[Docker Images Python Scraper and Flask API]
-    end
-    B --> C[Azure Container Registry ACR]
-    C --> D[Azure Container Instances ACI]
-    D --> E[Python Scraper collects and transforms data]
-    E --> F[Flask API]
-    F --> G[Azure Blob Storage]
-    G --> H[Azure Data Factory Pipeline]
-    H --> I[Azure SQL Database Upsert]
+    A[GitHub Actions CI/CD] --> B[Start ACI - Flask API]
+    B --> C[Run Python Selenium Scraper]
+    C --> D[Flask API receives and uploads data]
+    D --> E[Azure Blob Storage]
+    E --> F[Trigger ADF Pipeline]
+    F --> G[Azure SQL Database Upsert]
+    B --> H[Stop ACI]
 
 
