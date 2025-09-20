@@ -11,10 +11,6 @@ A Python scraper that collects stock market prices using **Selenium**, sends tra
 - [Technologies](#technologies)
 - [Features](#features)
 - [Architecture](#architecture)
-- [Contributing](#contributing)
-- [Contributors](#contributors)
-- [Author](#author)
-- [Change log](#change-log)
 - [License](#license)
 
 ---
