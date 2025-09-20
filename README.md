@@ -20,13 +20,14 @@ A Python scraper that collects stock market prices from a list of URLs, transfor
 ```mermaid
 graph TD
     subgraph CI/CD
-        A[GitHub Actions CI/CD] --> B[Docker Images (Python Scraper + Flask API)]
+        A[GitHub Actions CI/CD] --> B[Docker Images Python Scraper and Flask API]
     end
-    B --> C[Azure Container Registry (ACR)]
-    C --> D[Azure Container Instances (ACI)]
+    B --> C[Azure Container Registry ACR]
+    C --> D[Azure Container Instances ACI]
     D --> E[Python Scraper collects and transforms data]
     E --> F[Flask API]
     F --> G[Azure Blob Storage]
     G --> H[Azure Data Factory Pipeline]
     H --> I[Azure SQL Database Upsert]
+
 
