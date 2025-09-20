@@ -1,12 +1,6 @@
 # 📈 Market Price Scraper
 
-![coverage](https://img.shields.io/badge/coverage-80%25-yellowgreen)
-![version](https://img.shields.io/badge/version-1.2.3-blue)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-
 A Python scraper that collects stock market prices using **Selenium**, sends transformed data to a **Flask API** hosted in **ACI**, stores files in **ADLS Gen2**, and triggers an **ADF pipeline** to upsert data into **Azure SQL Database**. Fully automated using **GitHub Actions CI/CD** and Docker.
-
-![Workflow Screenshot](https://user-images.githubusercontent.com/<your-screenshot-here>.png)
 
 ---
 
@@ -88,7 +82,6 @@ This project uses the following technologies and tools:
 - 🔄 CI/CD pipeline builds Docker images and deploys the API to ACI  
 - ⏰ Scheduled execution via GitHub Actions  
 - 🔄 ADF pipeline transforms and upserts data into Azure SQL Database  
-- 💾 Data persisted in ADLS Gen2 for audit and reprocessing  
 
 ---
 
@@ -98,45 +91,11 @@ This project uses the following technologies and tools:
 graph TD
     A[GitHub Actions CI/CD] --> B[Start ACI - Flask API]
     B --> C[Run Python Selenium Scraper]
-    C --> D[Flask API receives and uploads data]
-    D --> E[ADLS Gen2 Storage]
-    E --> F[Trigger ADF Pipeline]
-    F --> G[Stop ACI]
-    F --> H[Azure SQL Database Upsert]
+    C --> D[Flask API receives and uploads data to ADLS Gen2 Storage]
+    D --> E[Trigger ADF Pipeline]
+    E --> F[Stop ACI]
+    E --> G[Azure SQL Database Upsert]
 ```
-
----
-
-## Contributing
-
-To contribute:
-
-1. Fork this repository  
-2. Create your feature branch (`git checkout -b feature-new`)  
-3. Make your changes  
-4. Commit your changes (`git commit -am 'Add new feature'`)  
-5. Push to the branch (`git push origin feature-new`)  
-6. Create a pull request  
-
----
-
-## Contributors
-
-- Neal Altares – [@nealaltares](https://github.com/nealaltares) – neal@example.com  
-
----
-
-## Author
-
-Neal Altares – [@nealaltares](https://github.com/nealaltares) – neal@example.com  
-
----
-
-## Change log
-
-- 1.2.3 – Workflow updated: ACI stops after triggering ADF pipeline  
-- 1.2.2 – Migrated storage from Blob to ADLS Gen2  
-- 1.0.0 – Initial working version with scraper and Flask API  
 
 ---
 
