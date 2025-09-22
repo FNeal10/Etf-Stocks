@@ -11,7 +11,6 @@ A Python scraper that collects stock market prices using Selenium, sends transfo
 - [Technologies](#technologies)
 - [Features](#features)
 - [Architecture](#architecture)
-- [License](#license)
 
 ---
 
@@ -76,13 +75,14 @@ This project uses the following technologies and tools:
 
 ## Features
 
-🕵️‍♂️ Scrapes stock prices from multiple sources using Selenium
-☁️ Flask API receives and uploads raw data (Bronze layer) to ADLS Gen2
-🔄 CI/CD pipeline builds Docker images and deploys the API to ACI
-🔄 ADF pipeline transforms and upserts data into Silver/Gold layers, Azure SQL, or Synapse
-💾 Stores optimized data as Parquet for cost-efficient storage
-📊 Connect Power BI to Azure SQL / Synapse / Parquet for dashboards and analytics
-🏗 Implements Medallion Architecture (Bronze → Silver → Gold) for structured, reliable data flow
+- 🕵️‍♂️ Scrapes stock prices from multiple sources using Selenium  
+- ☁️ Flask API receives and uploads raw data (Bronze layer) to ADLS Gen2  
+- 🔄 CI/CD pipeline builds Docker images and deploys the API to ACI  
+- 🔄 ADF pipeline transforms and upserts data into Silver/Gold layers, Azure SQL, or Synapse  
+- 💾 Stores optimized data as Parquet for cost-efficient storage  
+- 📊 Connect Power BI to Azure SQL / Synapse / Parquet for dashboards and analytics  
+- 🏗 Implements Medallion Architecture (Bronze → Silver → Gold) for structured, reliable data flow
+
 
 ---
 
