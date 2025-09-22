@@ -46,8 +46,9 @@ jobs:
   
   silver-to-sql:
     needs: scrape-and-transform
-    uses: ./.github/workflows/push_silver_to_sql.yml
+    uses: ./.github/workflows/trigger_adf.yml
     secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       ADF_NAME: ${{ secrets.ADF_NAME }}
       AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       ADF_PIPELINE_NAME: ${{ secrets.ADF_PIPELINE_NAME }}

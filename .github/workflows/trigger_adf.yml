@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   workflow_call:   
     secrets:
+      AZURE_CREDENTIALS:
+        description: 'Azure credentials'
+        required: true
       ADF_NAME:
         description: 'Azure Data Factory Name'
         required: true   
