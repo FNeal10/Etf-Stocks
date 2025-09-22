@@ -1,6 +1,6 @@
 # 📈 Market Price Scraper
 
-A Python scraper that collects stock market prices using **Selenium**, sends transformed data to a **Flask API** hosted in **ACI**, stores files in **ADLS Gen2**, and triggers an **ADF pipeline** to upsert data into **Azure SQL Database**. Fully automated using **GitHub Actions CI/CD** and Docker.
+A Python scraper that collects stock market prices using Selenium, sends transformed data to a Flask API hosted in ACI, stores files in ADLS Gen2, triggers an ADF pipeline to upsert data into Azure SQL Database, Synapse, or save as Parquet in ADLS Gen2 following a Medallion Architecture (Bronze → Silver → Gold). Visualize insights with Power BI dashboards. Fully automated using GitHub Actions CI/CD and Docker.
 
 ---
 
@@ -68,16 +68,21 @@ This project uses the following technologies and tools:
 - [ADLS Gen2](https://learn.microsoft.com/en-us/azure/storage/data-lake-storage/) ![ADLS Gen2](https://img.shields.io/badge/ADLS%20Gen2-%23007FFF.svg?style=for-the-badge)  
 - [Azure Data Factory](https://learn.microsoft.com/en-us/azure/data-factory/) ![ADF](https://img.shields.io/badge/ADF-%23007FFF.svg?style=for-the-badge)  
 - [Azure SQL Database](https://learn.microsoft.com/en-us/azure/azure-sql/) ![Azure SQL](https://img.shields.io/badge/Azure%20SQL-%23007FFF.svg?style=for-the-badge)  
+- [Azure Synapse Analytics](https://learn.microsoft.com/en-us/azure/synapse-analytics/) ![Synapse](https://img.shields.io/badge/Synapse-%23007FFF.svg?style=for-the-badge)  
+- [Parquet](https://parquet.apache.org/) ![Parquet](https://img.shields.io/badge/Parquet-%23007FFF.svg?style=for-the-badge)  
+- [Power BI](https://powerbi.microsoft.com/) ![Power BI](https://img.shields.io/badge/Power%20BI-%23F2C811.svg?style=for-the-badge&logo=power-bi&logoColor=black)
 
 ---
 
 ## Features
 
-- 🕵️‍♂️ Scrapes stock prices from multiple sources using Selenium  
-- ☁️ Flask API receives and uploads data to **ADLS Gen2**  
-- 🔄 CI/CD pipeline builds Docker images and deploys the API to ACI  
-- ⏰ Scheduled execution via GitHub Actions  
-- 🔄 ADF pipeline transforms and upserts data into Azure SQL Database  
+🕵️‍♂️ Scrapes stock prices from multiple sources using Selenium
+☁️ Flask API receives and uploads raw data (Bronze layer) to ADLS Gen2
+🔄 CI/CD pipeline builds Docker images and deploys the API to ACI
+🔄 ADF pipeline transforms and upserts data into Silver/Gold layers, Azure SQL, or Synapse
+💾 Stores optimized data as Parquet for cost-efficient storage
+📊 Connect Power BI to Azure SQL / Synapse / Parquet for dashboards and analytics
+🏗 Implements Medallion Architecture (Bronze → Silver → Gold) for structured, reliable data flow
 
 ---
 
@@ -87,10 +92,11 @@ This project uses the following technologies and tools:
 graph TD
     A[GitHub Actions CI/CD] --> B[Start ACI - Flask API]
     B --> C[Run Python Selenium Scraper]
-    C --> D[Flask API receives and uploads data to ADLS Gen2 Storage]
-    D --> E[Trigger ADF Pipeline]
+    C --> D[Flask API receives and uploads Bronze data to ADLS Gen2]
+    D --> E[Trigger ADF Pipeline for Silver/Gold transformations]
     E --> F[Stop ACI]
-    E --> G[Azure SQL Database Upsert]
+    E --> G[Upsert data to Azure SQL Database / Synapse / ADLS Gen2 as Parquet]
+    G --> H[Power BI Dashboards & Analytics]
 ```
 
 ---
