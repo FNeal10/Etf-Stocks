@@ -99,7 +99,7 @@ def main():
                 prices_list = [datetime.now().strftime("%m/%d/%Y"), prices["open"], prices["high"], prices["low"], prices["close"], prices["volume"]]
                 append_ohclv(api, ticker, prices_list)  
         except Exception as e:
-            print(f"Error scraping for {ticker}: {e}")
+            print(f"Error scraping for {ticker} : {e}")
         finally:
             driver.quit()
         
