@@ -1,0 +1,25 @@
+# Project metadata
+name: 'etf_stocks_dbt'        # your project name
+version: '1.0.0'
+profile: 'etf_stocks_dbt'     # matches the profile in profiles.yml
+
+# Paths for different types of dbt files
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Directories removed when running dbt clean
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  etf_stocks:
+    staging:
+      +materialized: table
+    marts:
+      +materialized: view
