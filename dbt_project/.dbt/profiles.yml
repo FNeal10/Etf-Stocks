@@ -6,3 +6,6 @@ etf_stocks_dbt:
       type: duckdb
       path: ./dev.duckdb
       threads: 1
+      extensions:
+       - httpfs
+       - parquet
