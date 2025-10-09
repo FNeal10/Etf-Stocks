@@ -18,8 +18,7 @@ clean-targets:
 
 # Model configurations
 models:
-  etf_stocks:
-    staging:
-      +materialized: table
-    marts:
-      +materialized: view
+  staging:
+    +materialized: table
+  marts:
+    +materialized: view
