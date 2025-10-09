@@ -18,7 +18,8 @@ clean-targets:
 
 # Model configurations
 models:
-  staging:
-    +materialized: table
-  marts:
-    +materialized: view
+  etf_stocks_dbt:          # matches the project name
+    staging:
+      +materialized: table
+    marts:
+      +materialized: view
