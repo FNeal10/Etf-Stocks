@@ -17,6 +17,9 @@ def create_table():
     """)
 
     con.close()
+
+def downloadReferenceSeed():
+    return
     
 if __name__ == "__main__":
-    create_table()
+    downloadReferenceSeed
