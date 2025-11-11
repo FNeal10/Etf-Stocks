@@ -36,22 +36,22 @@ jobs:
               with:
                 creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-           # - name: Deploy to ACI
-           #   uses: azure/aci-deploy@v1
-           #   with:
-           #     resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
-           #     name: ${{ secrets.ACI_NAME }}
-           #     image: ${{ secrets.ACR_NAME }}/${{ secrets.IMAGE_NAME }}:latest
-           #     location: ${{ secrets.AZURE_LOCATION }}
-           #     registry-login-server: ${{ secrets.ACR_NAME }}
-           #     registry-username: ${{ secrets.ACR_USERNAME }}
-           #     registry-password: ${{ secrets.ACR_PASSWORD }}
-           #     dns-name-label: ${{ secrets.DNS_NAME_LABEL }}
-           #     os-type: Linux
-           #     ports: ${{ secrets.API_PORT }}
-            #    restart-policy: OnFailure
-            #    environment-variables: |
-            #      AZURE_CONNECTION_STRING=${{ secrets.AZURE_CONNECTION_STRING }}
-            #      CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}
-            #      BRONZE_LOCATION=${{ secrets.BRONZE_LOCATION }}
-            #      SILVER_LOCATION=${{ secrets.SILVER_LOCATION }}
+            - name: Deploy to ACI
+              uses: azure/aci-deploy@v1
+              with:
+                resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+                name: ${{ secrets.ACI_NAME }}
+                image: ${{ secrets.ACR_NAME }}/${{ secrets.IMAGE_NAME }}:latest
+                location: ${{ secrets.AZURE_LOCATION }}
+                registry-login-server: ${{ secrets.ACR_NAME }}
+                registry-username: ${{ secrets.ACR_USERNAME }}
+                registry-password: ${{ secrets.ACR_PASSWORD }}
+                dns-name-label: ${{ secrets.DNS_NAME_LABEL }}
+                os-type: Linux
+                ports: ${{ secrets.API_PORT }}
+                restart-policy: OnFailure
+                environment-variables: |
+                 AZURE_CONNECTION_STRING=${{ secrets.AZURE_CONNECTION_STRING }}
+                 CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}
+                 BRONZE_LOCATION=${{ secrets.BRONZE_LOCATION }}
+                 SILVER_LOCATION=${{ secrets.SILVER_LOCATION }}
