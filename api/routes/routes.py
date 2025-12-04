@@ -59,6 +59,9 @@ def create_silver():
         params = request.get_json()
         ticker = params.get("ticker")
         silver_file = params.get("data")
+
+        ##print(ticker)
+        ##print(silver_file)
        
         result = create_silver_file(silver_file, ticker)
         return jsonify(result), 201 if result.get("is_success") else 400

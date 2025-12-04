@@ -8,7 +8,9 @@ from azure.storage.filedatalake import DataLakeServiceClient
 
 from datetime import datetime
 import pandas as pd
+import json
 import os
+import uuid
 
 if os.path.exists('.env'):
     load_dotenv()
@@ -88,7 +90,7 @@ def get_file_data(file_name):
         return None
     except Exception as e:
         return None
-
+    
 def create_silver_file(silver_file, ticker):
     """
     Creates a silver file from the provided csv file.
@@ -99,24 +101,21 @@ def create_silver_file(silver_file, ticker):
     service_client = DataLakeServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
     fs_client = service_client.get_file_system_client(os.getenv("CONTAINER_NAME"))
     dir_client = fs_client.get_directory_client(f"silver/stocks/{ticker}")
-    
-    file_name = f"{datetime.now().strftime('%Y-%m-%d')}.csv"
-    file_client = dir_client.create_file(file_name)
-    
-    data = silver_file.encode('utf-8')
-    file_client.append_data(data, offset=0, length=len(data))
-    file_client.flush_data(len(data))
-    
-    return {"is_success": True, "message": "Silver file created successfully"}
+ 
+    try:
+        unique_id = uuid.uuid4()
+        file_name = f"{datetime.now().strftime('%Y-%m-%d')}.csv"
+        file_path = f"silver/stocks/{ticker}/{file_name}"
 
+        file_client = fs_client.get_file_client(file_path)
+        
+        data = silver_file.encode('utf-8')
+        file_client.upload_data(data, overwrite=True, content_settings=ContentSettings(content_type='text/csv')) 
 
-    #blob_name = f"{silver_path}{ticker}/{datetime.now().strftime('%Y-%m-%d')}.csv"
-    #blob_client = container_client.get_blob_client(blob=blob_name)
-
-    #try:
-    #    data = silver_file.encode('utf-8')
-    #    blob_client.upload_blob(data, overwrite=True, content_settings=ContentSettings(content_type='text/csv'))
-    #    return {"is_success": True, "message": "Silver file created successfully"}
-    #except Exception as e:
-    #    return {"is_success": False, "message": str(e)}
-    
+        return {"is_success": True, "message": "Silver file created successfully"}
+    except Exception as e:
+        print(str(e))
+        if "ConditionNotMet" in str(e):
+            return {"is_success": True, "message": f"Silver file '{file_name}' created (ConditionNotMet ignored)"}
+        else:
+            return {"is_success": False, "message": str(e)}

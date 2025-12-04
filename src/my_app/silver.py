@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import pandas as pd
 
 import requests
@@ -141,6 +142,7 @@ def upload_silver(api, df, ticker):
             "data": df.to_csv(index=False),
             "ticker": ticker
         }
+        #print(json.dumps(payload))
         response = requests.post(f"{api}/create-silver", json=payload)
         response.raise_for_status()
     except Exception as e:
