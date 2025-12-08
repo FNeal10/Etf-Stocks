@@ -22,7 +22,7 @@ jobs:
       - name: Wait for API to load
         run: |
           echo "Sleep 10 minutes for API to load"
-          sleep 600
+          sleep 900
 
   scrape-and-transform:
     needs: wait-for-api-to-load
@@ -43,12 +43,3 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       ACI_NAME: ${{ secrets.ACI_NAME }}
-  
-  silver-to-sql:
-    needs: scrape-and-transform
-    uses: ./.github/workflows/trigger_adf.yml
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      ADF_NAME: ${{ secrets.ADF_NAME }}
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      ADF_PIPELINE_NAME: ${{ secrets.ADF_PIPELINE_NAME }}
