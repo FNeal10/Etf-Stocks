@@ -48,6 +48,7 @@ def append_latest_ohclv(ticker_name, market_data:list):
     :return: None
     """
     blob_name = f"{bronze_path}{ticker_name}.csv"
+    print(blob_name)
     blob_client = container_client.get_blob_client(blob=blob_name)
     blob_data = blob_client.download_blob().readall()
     existing_data = pd.read_csv(BytesIO(blob_data))
@@ -58,9 +59,9 @@ def append_latest_ohclv(ticker_name, market_data:list):
     
     data = pd.concat([latest_data, existing_data], ignore_index=True)
     blob_data = data.to_csv(index=False).encode('utf-8')
-
+    print(f"sAppending data to blob '{blob_name}'... in directory {bronze_path}")
     try:
-        print(f"Appending data to blob '{blob_name}'... in directory {bronze_path}")
+        
         blob_client.upload_blob(blob_data, overwrite=True)
         return {"is_success": True, "message": "Data appended successfully"}
     except Exception as e:
