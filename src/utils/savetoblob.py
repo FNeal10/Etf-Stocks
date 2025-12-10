@@ -60,6 +60,7 @@ def append_latest_ohclv(ticker_name, market_data:list):
     blob_data = data.to_csv(index=False).encode('utf-8')
 
     try:
+        print(f"Appending data to blob '{blob_name}'... in directory {bronze_path}")
         blob_client.upload_blob(blob_data, overwrite=True)
         return {"is_success": True, "message": "Data appended successfully"}
     except Exception as e:
