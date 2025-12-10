@@ -6,26 +6,25 @@ on:
     - cron: '0 13 * * 1-5'
 
 jobs:
-  start-aci:
-    uses: ./.github/workflows/start_stop_aci.yml
-    with:
-      action: 'start'
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      ACI_NAME: ${{ secrets.ACI_NAME }}
+#  start-aci:
+#    uses: ./.github/workflows/start_stop_aci.yml
+#    with:
+#      action: 'start'
+#    secrets:
+#      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+#      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+#      ACI_NAME: ${{ secrets.ACI_NAME }}
   
-  wait-for-api-to-load:
-    needs: start-aci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for API to load
-        run: |
-          echo "Sleep 10 minutes for API to load"
-          sleep 900
+#  wait-for-api-to-load:
+#    needs: start-aci
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Wait for API to load
+#        run: |
+#          echo "Sleep 10 minutes for API to load"
+#          sleep 900
 
   scrape-and-transform:
-    needs: wait-for-api-to-load
     uses: ./.github/workflows/scrape_and_transform.yml
     secrets:
       AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
@@ -33,13 +32,13 @@ jobs:
       API_URL: ${{ secrets.API_URL }}
       API_PORT: ${{ secrets.API_PORT }}
 
-  stop-aci:
-    if: always()
-    needs: scrape-and-transform
-    uses: ./.github/workflows/start_stop_aci.yml
-    with:
-      action: 'stop'
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-      ACI_NAME: ${{ secrets.ACI_NAME }}
+#  stop-aci:
+#    if: always()
+#    needs: scrape-and-transform
+#    uses: ./.github/workflows/start_stop_aci.yml
+#    with:
+#      action: 'stop'
+#    secrets:
+#      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+#     AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+#     ACI_NAME: ${{ secrets.ACI_NAME }}

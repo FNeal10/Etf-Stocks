@@ -1,0 +1,14 @@
+dbt_project:
+  target: prod
+  outputs:
+    prod:
+      type: snowflake
+      account: https://my76975.ca-central-1.aws.snowflakecomputing.com
+      user: 
+      password: 
+      role: ACCOUNTADMIN
+      database: STOCK_MARKET
+      warehouse: COMPUTE_WH
+      schema: MARKETSCHEMA
+      threads: 4
+

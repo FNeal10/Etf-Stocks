@@ -9,6 +9,7 @@ import numpy as np
 from io import StringIO, BytesIO
 from dotenv import load_dotenv
 
+from src.utils.savetoblob import *
 from src.utils.helper import format_to_decimal
 
 if os.path.exists('.env'):
@@ -115,53 +116,50 @@ def add_features(df, source=None):
     return df
 
 
-def get_bronze_files(api):
+def get_bronze():
     try:
-        response = requests.post(f"{api}get-bronze")
-        response.raise_for_status()
-        return response.json()
+        bronze = get_bronze_files()
+        return bronze
     except Exception as e:
         print(f"Error fetching bronze files: {e}")
         return []
 
-def get_data_contents(api, file_name):
-    payload = {
-        "file": file_name
-    }
+def get_data_contents(file_name):
     try:
-        response = requests.post(f"{api}get-file", json=payload)
-        response.raise_for_status()
-        return pd.read_csv(StringIO(response.text))
+        data = get_file_data(file_name)
+        return pd.read_csv(StringIO(data))
     except Exception as e:
         print(f"Error fetching data contents: {e}")
         return pd.DataFrame()
 
-def upload_silver(api, df, ticker):
+def upload_silver(df, ticker):
     try:
-        payload = {
-            "data": df.to_csv(index=False),
-            "ticker": ticker
-        }
-        #print(json.dumps(payload))
-        response = requests.post(f"{api}/create-silver", json=payload)
-        response.raise_for_status()
+        result = create_silver_file(df, ticker)
+        if result["is_success"]:
+            print(f"Successfully created silver data for {ticker}")
+        else:
+            print(f"Failed to create silver data for {ticker}: {result.get('error')}")
     except Exception as e:
         print(f"Error uploading silver file: {e}")
 
 def main():
-    api = f"{os.getenv('API_URL')}:{os.getenv('API_PORT')}/"
+    #api = f"{os.getenv('API_URL')}:{os.getenv('API_PORT')}/"
 
     print(f"Getting bronze files...")
-    bronze_data = get_bronze_files(api)
+    bronze_data = get_bronze()
     if bronze_data:
         for data in bronze_data:
+            print(data)
+            
             tickername = data.replace(".csv","").replace("bronze/","")
             print(f"Processing {data}...")
-            contents = get_data_contents(api, data.replace("bronze/",""))
+            contents = get_data_contents(data.replace("bronze/",""))
+            print(f"Contents generated for {data}...")
             if not contents.empty:
                 df_cleaned = clean_data(contents)
                 df_cleaned = add_features(df_cleaned, tickername)
-                upload_silver(api, df_cleaned, tickername)
+                print(f"Cleaned and added features for {data}... Uploading to blob storage.")
+                upload_silver(df_cleaned, tickername)
     else:
         pass
 

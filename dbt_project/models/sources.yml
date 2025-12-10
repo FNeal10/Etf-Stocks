@@ -1,8 +1,0 @@
-version: 2
-
-sources:
-  - name: adls_gold
-    description: "Raw data from ADLS"
-    tables:
-      - name: gold_table
-        description: "Raw data of ETF stocks"
