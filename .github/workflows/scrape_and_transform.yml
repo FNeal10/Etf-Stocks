@@ -10,11 +10,11 @@ on:
       CONTAINER_NAME:
         description: 'Azure Storage container name'
         required: true   
-      API_URL:
-        description: 'API URL'
+      BRONZE_LOCATION:
+        description: 'Bronze location in Azure Storage'
         required: true
-      API_PORT:
-        description: 'API Port'
+      SILVER_LOCATION:
+        description: 'Silver location in Azure Storage'
         required: true
 
 jobs:
@@ -36,8 +36,8 @@ jobs:
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-          API_URL: ${{ secrets.API_URL }}
-          API_PORT: ${{ secrets.API_PORT }}
+          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
           PYTHONPATH: .
         run: python scripts/run_scraper.py
 
@@ -45,7 +45,7 @@ jobs:
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-          API_URL: ${{ secrets.API_URL }}
-          API_PORT: ${{ secrets.API_PORT }}
+          BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+          SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
           PYTHONPATH: .
         run: python scripts/run_silver.py

@@ -29,8 +29,8 @@ jobs:
     secrets:
       AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-      API_URL: ${{ secrets.API_URL }}
-      API_PORT: ${{ secrets.API_PORT }}
+      BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
+      SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
 
 #  stop-aci:
 #    if: always()
