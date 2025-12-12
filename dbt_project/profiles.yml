@@ -3,12 +3,12 @@ dbt_project:
   outputs:
     prod:
       type: snowflake
-      account: https://my76975.ca-central-1.aws.snowflakecomputing.com
-      user: 
+      account: mq89355.canada-central.azure
+      user: DBT_USER
       password: 
-      role: ACCOUNTADMIN
-      database: STOCK_MARKET
+      role: DBT_ROLE
+      database: MARKETDATA
       warehouse: COMPUTE_WH
-      schema: MARKETSCHEMA
+      schema: MARKET
       threads: 4
 

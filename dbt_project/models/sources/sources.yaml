@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: src_stocks_info
+    database: MARKETDATA
+    schema: MARKET
+    tables:
+      - name: STOCKS_INFO
+        description: "Source table for stocks"
