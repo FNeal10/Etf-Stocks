@@ -27,7 +27,10 @@ models:
     # Config indicated by + and applies to all files under models/example/
     staging:
       +materialized: view
-      snowflake_warehouse: COMPUTE_WH
+      +schema: STAGING
     marts:
-      +materialized: table
-      snowflake_warehouse: COMPUTE_WH
+      +schema: MARTS
+      dimensions:
+        +materialized: table
+      facts:
+        +materialized: table

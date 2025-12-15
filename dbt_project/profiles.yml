@@ -4,9 +4,9 @@ dbt_project:
     prod:
       type: snowflake
       account: mq89355.canada-central.azure
-      user: DBT_USER
+      user: NCSTUDIOS316
       password: 
-      role: DBT_ROLE
+      role: 
       database: MARKETDATA
       warehouse: COMPUTE_WH
       schema: MARKET

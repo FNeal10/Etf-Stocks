@@ -6,4 +6,11 @@ sources:
     schema: MARKET
     tables:
       - name: STOCKS_INFO
-        description: "Source table for stocks"
+        description: "Source table for stocks information"
+        
+  - name: src_daily_stock_prices
+    database: MARKETDATA
+    schema: MARKET
+    tables:
+      - name: DAILY_STOCKS
+        description: "Source table for daily stocks"
