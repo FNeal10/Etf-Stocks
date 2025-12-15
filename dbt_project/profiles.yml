@@ -3,12 +3,12 @@ dbt_project:
   outputs:
     prod:
       type: snowflake
-      account: mq89355.canada-central.azure
-      user: NCSTUDIOS316
-      password: 
-      role: 
-      database: MARKETDATA
-      warehouse: COMPUTE_WH
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
       schema: MARKET
       threads: 4
 

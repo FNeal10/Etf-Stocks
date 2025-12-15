@@ -6,10 +6,10 @@
 }}
 WITH stocks_info AS (
     SELECT
-        Ticker as market_ticker,
-        Type as market_type,
-        Name as company_name,
-        Url as scraped_from
+        market_ticker,
+        market_type,
+        company_name,
+        scraped_from
     FROM {{ ref('stg_stock_info') }}
 )
 

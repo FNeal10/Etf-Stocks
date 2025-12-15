@@ -1,41 +1,45 @@
 {{
     config(
         materialized='incremental',
-        unique_key='calendar_date'
+        unique_key=['Ticker', 'Trade_Date']
     )
 }}
 
-with raw_dates as (
+with
+
+{% if is_incremental() %}
+max_dates as (
+    select
+        Ticker,
+        max(Trade_Date) as last_trade_date
+    from {{ this }}
+    group by Ticker
+),
+{% endif %}
+
+trading_dates as (
     select distinct
-    Date as calendar_date,
-    Year as calendar_year,
-    Month as calendar_month,
-    Day as calendar_day,
-    DayOfWeek as day_of_week,
-    DayOfYear as day_of_year,
-    WeekOfYear as week_of_year,
-    Quarter as year_quarter,
-    IsMonthStart as is_start_of_the_month,
-    IsMonthEnd as is_end_of_the_month,
-    IsQuarterStart as is_start_of_the_quarter,
-    IsQuarterEnd as is_end_of_the_quarter
-    from {{ ref('stg_daily_stock_prices') }}
+        s.Ticker,
+        s.Trade_Date,
+        s.Trade_Year,
+        s.Trade_Month,
+        s.Trade_Day,
+        s.Trade_Day_of_Week,
+        s.Trade_Day_of_Year,
+        s.Trade_Week_of_Year,
+        s.Trade_Quarter,
+        s.Is_Start_of_Month,
+        s.Is_End_of_Month,
+        s.Is_Start_of_Quarter,
+        s.Is_End_of_Quarter
+    from {{ ref('stg_daily_stock_prices') }} s
 
     {% if is_incremental() %}
-        where Date > (select max(calendar_date) from {{ this }})
+    left join max_dates m
+        on s.Ticker = m.Ticker
+    where s.Trade_Date > coalesce(m.last_trade_date, '1900-01-01')
     {% endif %}
 )
-select
-    calendar_date,
-    calendar_year,
-    calendar_month,
-    calendar_day,
-    day_of_week,
-    day_of_year,
-    week_of_year,
-    year_quarter,
-    is_start_of_the_month,
-    is_end_of_the_month,
-    is_start_of_the_quarter,
-    is_end_of_the_quarter
-from raw_dates
+
+select *
+from trading_dates
