@@ -1,0 +1,58 @@
+name: Run DBT
+
+on:
+  workflow_dispatch:   # allows manual trigger
+  workflow_call:       # allows parent workflow to call this workflow
+    secrets:
+      SNOWFLAKE_USER:
+        description: 'Snowflake user'
+        required: true
+      SNOWFLAKE_PASSWORD:
+        description: 'Snowflake password'
+        required: true
+      SNOWFLAKE_ROLE:
+        description: 'Snowflake role'
+        required: true
+      SNOWFLAKE_ACCOUNT:
+        description: 'Snowflake account'
+        required: true
+      SNOWFLAKE_WAREHOUSE:
+        description: 'Snowflake warehouse'
+        required: true
+      SNOWFLAKE_DATABASE:
+        description: 'Snowflake database'
+        required: true
+
+jobs:
+  run-dbt:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      # 3. Install dbt and Snowflake adapter
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core dbt-snowflake
+
+      # 4. Run dbt commands
+      - name: Run dbt models
+        env:
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+        run: |
+          dbt deps --project-dir dbt_project --profiles-dir dbt_project
+          dbt run --project-dir dbt_project --profiles-dir dbt_project
