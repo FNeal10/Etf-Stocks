@@ -1,22 +1,19 @@
 {{
     config(
-        materialized='incremental',
+        matierialized='incremental',
         unique_key=['Ticker','Trade_Date']
     )
 }}
 
 with
 
-sma_data as (
+volume_data as (
     select
     Ticker,
     Trade_Date,
-    SMA_5_Day,
-    SMA_10_Day,
-    SMA_20_Day,
-    SMA_50_Day,
-    SMA_100_Day,
-    SMA_200_Day
+    Trade_Volume,
+    Volume_20_Day,
+    Volume_50_Day
     from {{ ref('stg_daily_stock_prices') }}
 
     {% if is_incremental() %}
@@ -27,5 +24,5 @@ sma_data as (
 )
 
 select 
-*
-from sma_data
+* 
+from volume_data

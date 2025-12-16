@@ -1,22 +1,17 @@
 {{
     config(
-        materialized='incremental',
+        matierialized='incremental',
         unique_key=['Ticker','Trade_Date']
     )
 }}
 
 with
 
-sma_data as (
+directional_trends_data as (
     select
-    Ticker,
-    Trade_Date,
-    SMA_5_Day,
-    SMA_10_Day,
-    SMA_20_Day,
-    SMA_50_Day,
-    SMA_100_Day,
-    SMA_200_Day
+    Plus_DI,
+    Minus_DI,
+    ADX_Value,
     from {{ ref('stg_daily_stock_prices') }}
 
     {% if is_incremental() %}
@@ -26,6 +21,5 @@ sma_data as (
     {% endif %}
 )
 
-select 
-*
-from sma_data
+select * from
+directional_trends_data

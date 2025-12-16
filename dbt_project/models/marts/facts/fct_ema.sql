@@ -7,25 +7,25 @@
 
 with
 
-sma_data as (
+ema_data as(
     select
     Ticker,
     Trade_Date,
-    SMA_5_Day,
-    SMA_10_Day,
-    SMA_20_Day,
-    SMA_50_Day,
-    SMA_100_Day,
-    SMA_200_Day
+    EMA_5_Day,
+    EMA_10_Day,
+    EMA_20_Day,
+    EMA_50_Day,
+    EMA_100_Day,
+    EMA_200_Day
     from {{ ref('stg_daily_stock_prices') }}
 
     {% if is_incremental() %}
-        where Trade_Date > ( 
+        where Trade_Date > (
                 select coalesce(max(Trade_Date), '1900-01-01') from {{ this }}
-            )
+        )
     {% endif %}
 )
 
-select 
+select
 *
-from sma_data
+from ema_data
