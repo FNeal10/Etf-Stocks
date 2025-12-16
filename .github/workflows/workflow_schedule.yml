@@ -31,6 +31,17 @@ jobs:
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
       BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
       SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
+  
+  run-dbt:
+    needs: scrape-and-transform
+    uses: ./.github/workflows/run_dbt.yml
+    secrets:
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
 
 #  stop-aci:
 #    if: always()
