@@ -6,23 +6,6 @@ on:
     - cron: '0 13 * * 1-5'
 
 jobs:
-#  start-aci:
-#    uses: ./.github/workflows/start_stop_aci.yml
-#    with:
-#      action: 'start'
-#    secrets:
-#      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-#      AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-#      ACI_NAME: ${{ secrets.ACI_NAME }}
-  
-#  wait-for-api-to-load:
-#    needs: start-aci
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Wait for API to load
-#        run: |
-#          echo "Sleep 10 minutes for API to load"
-#          sleep 900
 
   scrape-and-transform:
     uses: ./.github/workflows/scrape_and_transform.yml
@@ -42,14 +25,3 @@ jobs:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
       SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-
-#  stop-aci:
-#    if: always()
-#    needs: scrape-and-transform
-#    uses: ./.github/workflows/start_stop_aci.yml
-#    with:
-#      action: 'stop'
-#    secrets:
-#      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-#     AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-#     ACI_NAME: ${{ secrets.ACI_NAME }}
