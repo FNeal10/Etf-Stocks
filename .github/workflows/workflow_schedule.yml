@@ -3,7 +3,7 @@ name: Parent workflow
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 13 * * 1-5'
+    - cron: '0 14 * * 1-5'  # 9 AM EST / 2 PM UTC, Mon-Fri
 
 jobs:
 
@@ -14,9 +14,56 @@ jobs:
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
       BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
       SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
-  
-  run-dbt:
+
+  call-snowflake-proc:
     needs: scrape-and-transform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Snowflake connector
+        run: pip install snowflake-connector-python
+
+      - name: Call Snowflake Stored Procedure
+        env:
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+        run: |
+          python - <<EOF
+          import snowflake.connector
+          import os
+
+          conn = snowflake.connector.connect(
+              user=os.environ['SNOWFLAKE_USER'],
+              password=os.environ['SNOWFLAKE_PASSWORD'],
+              account=os.environ['SNOWFLAKE_ACCOUNT'],
+              role=os.environ['SNOWFLAKE_ROLE'],
+              warehouse=os.environ['SNOWFLAKE_WAREHOUSE'],
+              database=os.environ['SNOWFLAKE_DATABASE']
+          )
+
+          cs = conn.cursor()
+          try:
+              # Replace with your stored procedure
+              cs.execute("CALL MY_SCHEMA.MY_STORED_PROC()")
+              print("Procedure executed successfully")
+          finally:
+              cs.close()
+              conn.close()
+          EOF
+
+  run-dbt:
+    needs: call-snowflake-proc
     uses: ./.github/workflows/run_dbt.yml
     secrets:
       SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
