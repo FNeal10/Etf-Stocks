@@ -3,7 +3,11 @@ name: Parent workflow
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 14 * * 1-5'  # 9 AM EST / 2 PM UTC, Mon-Fri
+    # Winter (EST, UTC−5): 7 AM Toronto = 12:00 UTC
+    - cron: '0 12 * 11,12,1,2,3 1-5'  # Nov, Dec, Jan, Feb, Mar
+
+    # Summer (EDT, UTC−4): 7 AM Toronto = 11:00 UTC
+    - cron: '0 11 * 4,5,6,7,8,9,10 1-5'  # Apr to Oct
 
 jobs:
 
