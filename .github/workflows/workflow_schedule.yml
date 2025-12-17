@@ -55,7 +55,7 @@ jobs:
           cs = conn.cursor()
           try:
               # Replace with your stored procedure
-              cs.execute("CALL MY_SCHEMA.MY_STORED_PROC()")
+              cs.execute("CALL MARKETDATA.MARKET.SP_UPSERTDAILYSTOCK()")
               print("Procedure executed successfully")
           finally:
               cs.close()
