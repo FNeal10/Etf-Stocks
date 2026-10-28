@@ -128,15 +128,14 @@ python-json-logger==3.3.0
 python-slugify==8.0.4
 pytimeparse==1.1.8
 pytz==2025.2
-<<<<<<< HEAD
+
 pywin32==311,sys_platform == "win32"
 pywin32-ctypes==0.2.3,sys_platform == "win32"
 pywinpty==2.0.15
-=======
+
 pywin32==311; platform_system == "Windows"
 pywin32-ctypes==0.2.3; platform_system == "Windows"
 pywinpty==2.0.15; platform_system == "Windows"
->>>>>>> ff984784c16310a95007555ee647f535f5755645
 PyYAML==6.0.2
 pyzmq==27.0.0
 referencing==0.36.2
