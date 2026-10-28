@@ -17,12 +17,20 @@ if os.path.exists('.env'):
 
 def clean_data(df):
     df["TransactionDate"] = pd.to_datetime(df["Date"].str.strip(), format='%m/%d/%Y')
+    
+    numeric_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+
+    for col in numeric_columns:
+        df[col] = pd.to_numeric(
+            df[col].astype(str).str.replace(',', '', regex=False),
+            errors='coerce'
+    )
 
     df["PriceOpen"] = df["Open"].apply(format_to_decimal).astype(float)
     df["PriceHigh"] = df["High"].apply(format_to_decimal).astype(float)
     df["PriceClose"] = df["Close"].apply(format_to_decimal).astype(float)
     df["PriceLow"] = df["Low"].apply(format_to_decimal).astype(float)
-    df["PriceVolume"] = df["Volume"].str.replace(r'\D', '', regex=True).astype(int)
+    df["PriceVolume"] = df["Volume"].astype("Int64")
     return df
 
 def add_features(df, source=None):
@@ -32,51 +40,51 @@ def add_features(df, source=None):
     df.insert(0, "Ticker", source)
 
     # ------------------- Date/Time Features -------------------
-    df['TransactionYear'] = df['TransactionDate'].dt.year
-    df['TransactionMonth'] = df['TransactionDate'].dt.month
-    df['TransactionDay'] = df['TransactionDate'].dt.day
-    df['TransactionDayOfWeek'] = df['TransactionDate'].dt.dayofweek
-    df['TransactionDayOfYear'] = df['TransactionDate'].dt.dayofyear
-    df['TransactionWeekOfYear'] = df['TransactionDate'].dt.isocalendar().week
-    df['TransactionQuarter'] = df['TransactionDate'].dt.quarter
+    df['Year'] = df['TransactionDate'].dt.year
+    df['Month'] = df['TransactionDate'].dt.month
+    df['Day'] = df['TransactionDate'].dt.day
+    df['DayOfWeek'] = df['TransactionDate'].dt.dayofweek
+    df['DayOfYear'] = df['TransactionDate'].dt.dayofyear
+    df['WeekOfYear'] = df['TransactionDate'].dt.isocalendar().week
+    df['Quarter'] = df['TransactionDate'].dt.quarter
     df['IsMonthStart'] = df['TransactionDate'].dt.is_month_start
     df['IsMonthEnd'] = df['TransactionDate'].dt.is_month_end
     df['IsQuarterStart'] = df['TransactionDate'].dt.is_quarter_start
     df['IsQuarterEnd'] = df['TransactionDate'].dt.is_quarter_end
 
     # ------------------- Price-Based Features -------------------
-    df['PriceChange'] = df['Close'] - df['Open']
-    df['HighLowRange'] = df['High'] - df['Low']
-    df['CloseOpenRange'] = df['Close'] - df['Open']
-    df['PercentChange'] = (df['Close'] - df['Open']) / df['Open']
+    df['PriceChange'] = df['PriceClose'] - df['PriceOpen']
+    df['HighLowRange'] = df['PriceHigh'] - df['PriceLow']
+    df['CloseOpenRange'] = df['PriceClose'] - df['PriceOpen']
+    df['PercentChange'] = (df['PriceClose'] - df['PriceOpen']) / df['PriceOpen']
 
     # ------------------- Moving Averages -------------------
     windows = [5, 10, 20, 50, 100, 200]
     for w in windows:
-        df[f"SMA_{w}"] = df['Close'].rolling(window=w).mean()
-        df[f"EMA_{w}"] = df['Close'].ewm(span=w, adjust=False).mean()
+        df[f"SMA_{w}"] = df['PriceClose'].rolling(window=w).mean()
+        df[f"EMA_{w}"] = df['PriceClose'].ewm(span=w, adjust=False).mean()
 
     # ------------------- Volatility -------------------
     df['Volatility_20'] = df['Close'].pct_change().rolling(window=20).std()
 
     # ------------------- Momentum Indicators -------------------
     # RSI
-    delta = df['Close'].diff()
+    delta = df['PriceClose'].diff()
     gain = delta.clip(lower=0).rolling(window=14).mean()
     loss = -delta.clip(upper=0).rolling(window=14).mean()
     rs = gain / loss
     df['RSI'] = 100 - (100 / (1 + rs))
 
     # MACD
-    df['EMA_12'] = df['Close'].ewm(span=12, adjust=False).mean()
-    df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
+    df['EMA_12'] = df['PriceClose'].ewm(span=12, adjust=False).mean()
+    df['EMA_26'] = df['PriceClose'].ewm(span=26, adjust=False).mean()
     df['MACD'] = df['EMA_12'] - df['EMA_26']
     df['Signal_Line'] = df['MACD'].ewm(span=9, adjust=False).mean()
 
     # ------------------- ADX & DI -------------------
     # True Range
-    df['TR'] = np.maximum(df['High'] - df['Low'], 
-                          np.maximum(abs(df['High'] - df['Close'].shift()), abs(df['Low'] - df['Close'].shift())))
+    df['TR'] = np.maximum(df['PriceHigh'] - df['PriceLow'], 
+                          np.maximum(abs(df['PriceHigh'] - df['PriceClose'].shift()), abs(df['PriceLow'] - df['PriceClose'].shift())))
     
     # Directional Movement
     df['+DM'] = df['High'].diff().clip(lower=0)
@@ -91,27 +99,34 @@ def add_features(df, source=None):
     df['ADX'] = abs(df['PlusDI'] - df['MinusDI']).rolling(14).mean()
 
     # ------------------- Parabolic SAR -------------------
-    df['SAR'] = df['Close'].rolling(2).mean()  
+    df['SAR'] = df['PriceClose'].rolling(2).mean()  
 
     # ------------------- Volume -------------------
-    df['Volume_20'] = df['Volume'].rolling(20).mean()
-    df['Volume_50'] = df['Volume'].rolling(50).mean()
+    df['Volume_20'] = df['PriceVolume'].rolling(20).mean()
+    df['Volume_50'] = df['PriceVolume'].rolling(50).mean()
 
     # ------------------- Bollinger Bands -------------------
     df['BB_Middle'] = df['SMA_20']
-    df['BB_Upper'] = df['BB_Middle'] + (df['Close'].rolling(20).std() * 2)
-    df['BB_Lower'] = df['BB_Middle'] - (df['Close'].rolling(20).std() * 2)
+    df['BB_Upper'] = df['BB_Middle'] + (df['PriceClose'].rolling(20).std() * 2)
+    df['BB_Lower'] = df['BB_Middle'] - (df['PriceClose'].rolling(20).std() * 2)
 
     # ------------------- Stochastic Oscillator -------------------
-    low_min = df['Low'].rolling(14).min()
-    high_max = df['High'].rolling(14).max()
-    df['Stochastic'] = ((df['Close'] - low_min) / (high_max - low_min)) * 100
+    low_min = df['PriceLow'].rolling(14).min()
+    high_max = df['PriceHigh'].rolling(14).max()
+    df['Stochastic'] = ((df['PriceClose'] - low_min) / (high_max - low_min)) * 100
 
     # ------------------- Commodity Channel Index -------------------
-    df['CCI'] = (df['Close'] - df['SMA_20']) / (0.015 * (df['High'] - df['Low']).rolling(20).mean())
+    df['CCI'] = (df['PriceClose'] - df['SMA_20']) / (0.015 * (df['PriceHigh'] - df['PriceLow']).rolling(20).mean())
 
     # Drop helper columns
-    df.drop(['TR', '+DM', '-DM'], axis=1, inplace=True)
+    df.drop(
+    columns=[
+        'TR', '+DM', '-DM',
+        'Date', 'Open', 'High', 'Low', 'Close', 'Volume'
+    ],
+    errors='ignore',
+    inplace=True
+)
 
     return df
 
