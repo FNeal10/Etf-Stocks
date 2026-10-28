@@ -8,7 +8,6 @@ from azure.storage.filedatalake import DataLakeServiceClient
 
 from datetime import datetime
 import pandas as pd
-import json
 import os
 
 if os.path.exists('.env'):
@@ -103,8 +102,7 @@ def create_silver_file(silver_file, ticker):
     """
     service_client = DataLakeServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
     fs_client = service_client.get_file_system_client(os.getenv("CONTAINER_NAME"))
-    dir_client = fs_client.get_directory_client(f"{silver_path}")
- 
+     
     try:
         file_name = f"{ticker}.csv"
         file_path = f"{silver_path}{file_name}"
@@ -122,3 +120,35 @@ def create_silver_file(silver_file, ticker):
             return {"is_success": True, "message": f"Silver file '{file_name}' created (ConditionNotMet ignored)"}
         else:
             return {"is_success": False, "message": str(e)}
+
+def get_silver_data():
+    """
+    Fetches all silver files from the Azure Blob Storage.
+    :return: Contents of the silver files as a list of DataFrames.
+    """
+    service_client = DataLakeServiceClient.from_connection_string(os.getenv("AZURE_CONNECTION_STRING"))
+    fs_client = service_client.get_file_system_client(os.getenv("CONTAINER_NAME"))
+    
+   
+    path = fs_client.get_paths(path=silver_path, recursive=False)
+    silver_files = [item.name for item in path if not item.is_directory 
+                        and item.name.lower().endswith(".csv")
+                    ]
+        
+    df = []
+        
+    for file in silver_files:
+        try:        
+            file_client = fs_client.get_file_client(file)
+            download = file_client.download_file()
+            downloaded_bytes = download.readall()
+            csv_string = downloaded_bytes.decode('utf-8')
+            df.append(pd.read_csv(StringIO(csv_string)))
+        
+        except Exception as e:
+            print(f"Error fetching Silver data: {e}")
+            raise
+    combined_df = pd.concat(df, ignore_index=True, sort=False)
+
+    return combined_df
+

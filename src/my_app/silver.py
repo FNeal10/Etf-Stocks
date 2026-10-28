@@ -9,36 +9,36 @@ import numpy as np
 from io import StringIO, BytesIO
 from dotenv import load_dotenv
 
-from src.utils.savetoblob import *
+from src.utils.adlsblob import *
 from src.utils.helper import format_to_decimal
 
 if os.path.exists('.env'):
     load_dotenv()
 
 def clean_data(df):
-    df["Date"] = pd.to_datetime(df["Date"].str.strip(), format='%m/%d/%Y')
+    df["TransactionDate"] = pd.to_datetime(df["Date"].str.strip(), format='%m/%d/%Y')
 
-    df["Open"] = df["Open"].apply(format_to_decimal).astype(float)
-    df["High"] = df["High"].apply(format_to_decimal).astype(float)
-    df["Close"] = df["Close"].apply(format_to_decimal).astype(float)
-    df["Low"] = df["Low"].apply(format_to_decimal).astype(float)
-    df["Volume"] = df["Volume"].str.replace(r'\D', '', regex=True).astype(int)
+    df["PriceOpen"] = df["Open"].apply(format_to_decimal).astype(float)
+    df["PriceHigh"] = df["High"].apply(format_to_decimal).astype(float)
+    df["PriceClose"] = df["Close"].apply(format_to_decimal).astype(float)
+    df["PriceLow"] = df["Low"].apply(format_to_decimal).astype(float)
+    df["PriceVolume"] = df["Volume"].str.replace(r'\D', '', regex=True).astype(int)
     return df
 
 def add_features(df, source=None):
 
     # Sort by date
-    df = df.sort_values(by="Date").reset_index(drop=True)
-    df.insert(0, "Source", source)
+    df = df.sort_values(by="TransactionDate").reset_index(drop=True)
+    df.insert(0, "Ticker", source)
 
     # ------------------- Date/Time Features -------------------
-    df['Year'] = df['Date'].dt.year
-    df['Month'] = df['Date'].dt.month
-    df['Day'] = df['Date'].dt.day
-    df['DayOfWeek'] = df['Date'].dt.dayofweek
-    df['DayOfYear'] = df['Date'].dt.dayofyear
-    df['WeekOfYear'] = df['Date'].dt.isocalendar().week
-    df['Quarter'] = df['Date'].dt.quarter
+    df['TransactionYear'] = df['Date'].dt.year
+    df['TransactionMonth'] = df['Date'].dt.month
+    df['TransactionDay'] = df['Date'].dt.day
+    df['TransactionDayOfWeek'] = df['Date'].dt.dayofweek
+    df['TransactionDayOfYear'] = df['Date'].dt.dayofyear
+    df['TransactionWeekOfYear'] = df['Date'].dt.isocalendar().week
+    df['TransactionQuarter'] = df['Date'].dt.quarter
     df['IsMonthStart'] = df['Date'].dt.is_month_start
     df['IsMonthEnd'] = df['Date'].dt.is_month_end
     df['IsQuarterStart'] = df['Date'].dt.is_quarter_start

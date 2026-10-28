@@ -1,4 +1,4 @@
-from src.utils.savetoblob import *
+from src.utils.adlsblob import *
 from datetime import datetime
 from time import sleep
 

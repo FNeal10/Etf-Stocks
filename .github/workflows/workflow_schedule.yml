@@ -1,16 +1,15 @@
-name: Parent workflow
+
+name: Scrape market data, transform, and save to Azure SQL Database
 
 on:
   workflow_dispatch:
   schedule:
-    # Winter (EST, UTC−5): 7 AM Toronto = 12:00 UTC
-    - cron: '0 12 * 11,12,1,2,3 1-5'  # Nov, Dec, Jan, Feb, Mar
-
-    # Summer (EDT, UTC−4): 7 AM Toronto = 11:00 UTC
-    - cron: '0 11 * 4,5,6,7,8,9,10 1-5'  # Apr to Oct
+    # 7 AM Toronto time during EST
+    - cron: '0 12 * 11,12,1,2,3 1-5'
+    # 7 AM Toronto time during EDT
+    - cron: '0 11 * 4,5,6,7,8,9,10 1-5'
 
 jobs:
-
   scrape-and-transform:
     uses: ./.github/workflows/scrape_and_transform.yml
     secrets:
@@ -19,60 +18,15 @@ jobs:
       BRONZE_LOCATION: ${{ secrets.BRONZE_LOCATION }}
       SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
 
-  # call-snowflake-proc:
-  #   needs: scrape-and-transform
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v3
-
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.11'
-
-  #     - name: Install Snowflake connector
-  #       run: pip install snowflake-connector-python
-
-  #     - name: Call Snowflake Stored Procedure
-  #       env:
-  #         SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-  #         SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-  #         SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-  #         SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-  #         SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-  #         SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-  #       run: |
-  #         python - <<EOF
-  #         import snowflake.connector
-  #         import os
-
-  #         conn = snowflake.connector.connect(
-  #             user=os.environ['SNOWFLAKE_USER'],
-  #             password=os.environ['SNOWFLAKE_PASSWORD'],
-  #             account=os.environ['SNOWFLAKE_ACCOUNT'],
-  #             role=os.environ['SNOWFLAKE_ROLE'],
-  #             warehouse=os.environ['SNOWFLAKE_WAREHOUSE'],
-  #             database=os.environ['SNOWFLAKE_DATABASE']
-  #         )
-
-  #         cs = conn.cursor()
-  #         try:
-  #             # Replace with your stored procedure
-  #             cs.execute("CALL MARKETDATA.MARKET.SP_UPSERTDAILYSTOCK()")
-  #             print("Procedure executed successfully")
-  #         finally:
-  #             cs.close()
-  #             conn.close()
-  #         EOF
-
-  # run-dbt:
-  #   needs: call-snowflake-proc
-  #   uses: ./.github/workflows/run_dbt.yml
-  #   secrets:
-  #     SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-  #     SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-  #     SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-  #     SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-  #     SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-  #     SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+  load-to-db:
+    needs: scrape-and-transform
+    uses: ./.github/workflows/load_to_azure.yml
+    secrets:
+      AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
+      DB_AZURE_SERVER: ${{ secrets.DB_AZURE_SERVER }}
+      DB_AZURE_DATABASE: ${{ secrets.DB_AZURE_DATABASE }}
+      DB_AZURE_USERNAME: ${{ secrets.DB_AZURE_USERNAME }}
+      DB_AZURE_PASSWORD: ${{ secrets.DB_AZURE_PASSWORD }}
+      DB_AZURE_STAGING_TABLE_NAME: ${{ secrets.DB_AZURE_STAGING_TABLE_NAME }}

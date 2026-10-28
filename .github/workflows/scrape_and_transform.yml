@@ -1,38 +1,36 @@
-name: Run scraper
+
+name: Scrape and Transform Market Data
 
 on:
-  workflow_dispatch:  
-  workflow_call:   
+  workflow_dispatch:
+  workflow_call:
     secrets:
       AZURE_CONNECTION_STRING:
-        description: 'Azure Storage connection string'
         required: true
       CONTAINER_NAME:
-        description: 'Azure Storage container name'
-        required: true   
+        required: true
       BRONZE_LOCATION:
-        description: 'Bronze location in Azure Storage'
         required: true
       SILVER_LOCATION:
-        description: 'Silver location in Azure Storage'
         required: true
 
 jobs:
   run-scraper:
     runs-on: windows-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3   
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
-                          
-      - name: Run scraper to get the latest stock prices
+        run: python -m pip install -r requirements.txt
+
+      - name: Scrape latest stock prices
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
@@ -41,7 +39,7 @@ jobs:
           PYTHONPATH: .
         run: python scripts/run_scraper.py
 
-      - name: Run Silver transformation
+      - name: Transform Bronze to Silver
         env:
           AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
           CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
