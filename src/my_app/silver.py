@@ -32,17 +32,17 @@ def add_features(df, source=None):
     df.insert(0, "Ticker", source)
 
     # ------------------- Date/Time Features -------------------
-    df['TransactionYear'] = df['Date'].dt.year
-    df['TransactionMonth'] = df['Date'].dt.month
-    df['TransactionDay'] = df['Date'].dt.day
-    df['TransactionDayOfWeek'] = df['Date'].dt.dayofweek
-    df['TransactionDayOfYear'] = df['Date'].dt.dayofyear
-    df['TransactionWeekOfYear'] = df['Date'].dt.isocalendar().week
-    df['TransactionQuarter'] = df['Date'].dt.quarter
-    df['IsMonthStart'] = df['Date'].dt.is_month_start
-    df['IsMonthEnd'] = df['Date'].dt.is_month_end
-    df['IsQuarterStart'] = df['Date'].dt.is_quarter_start
-    df['IsQuarterEnd'] = df['Date'].dt.is_quarter_end
+    df['TransactionYear'] = df['TransactionDate'].dt.year
+    df['TransactionMonth'] = df['TransactionDate'].dt.month
+    df['TransactionDay'] = df['TransactionDate'].dt.day
+    df['TransactionDayOfWeek'] = df['TransactionDate'].dt.dayofweek
+    df['TransactionDayOfYear'] = df['TransactionDate'].dt.dayofyear
+    df['TransactionWeekOfYear'] = df['TransactionDate'].dt.isocalendar().week
+    df['TransactionQuarter'] = df['TransactionDate'].dt.quarter
+    df['IsMonthStart'] = df['TransactionDate'].dt.is_month_start
+    df['IsMonthEnd'] = df['TransactionDate'].dt.is_month_end
+    df['IsQuarterStart'] = df['TransactionDate'].dt.is_quarter_start
+    df['IsQuarterEnd'] = df['TransactionDate'].dt.is_quarter_end
 
     # ------------------- Price-Based Features -------------------
     df['PriceChange'] = df['Close'] - df['Open']
