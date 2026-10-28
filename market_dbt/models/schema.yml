@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  -  name: market_data
+     description: "Market data source"
+     schema: "dbo"
+     tables:
+       - name: "market_prices"
+         description: "Stock prices data"
