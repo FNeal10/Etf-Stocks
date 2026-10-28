@@ -1,5 +1,5 @@
 
-name: Scrape market data, transform, and save to Azure SQL Database
+name: Main Workflow
 
 on:
   workflow_dispatch:
