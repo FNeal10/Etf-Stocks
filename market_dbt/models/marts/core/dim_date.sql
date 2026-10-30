@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     CONVERT(int, CONVERT(char(8), transaction_date, 112)) AS date_key,
     transaction_date,
     [year],
@@ -12,4 +12,4 @@ SELECT
     is_month_end,
     is_quarter_start,
     is_quarter_end
-FROM {{ ref('stg_stocks__market_prices') }}
+FROM {{ ref('stg_stocks_market_prices') }}

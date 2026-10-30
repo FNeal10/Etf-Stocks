@@ -1,0 +1,12 @@
+TICKER,TYPE,NAME,URL
+bdo,stocks,BDO Unibank,https://www.pse.com.ph/company-information-BDO/
+mreit,stocks,Megaworld,https://www.pse.com.ph/company-information-MREIT/
+creit,stocks,Citicore Energy,https://www.pse.com.ph/company-information-CREIT/
+areit,stocks,Ayala Land,https://www.pse.com.ph/company-information-AREIT/
+filrt,stocks,Filinvest,https://www.pse.com.ph/company-information-FILRT/
+rcr,stocks,Robinsons Land,https://www.pse.com.ph/company-information-RCR/
+preit,stocks,Premiere Island Power REIT Corp.,https://www.pse.com.ph/company-information-preit/
+ddmpr,stocks,"DDMP REIT, Inc.",https://www.pse.com.ph/company-information-DDMPR/
+mer,stocks,"Meralco",https://www.pse.com.ph/company-information-MER/
+glo,stocks,"Globe Telecom",https://www.pse.com.ph/company-information-GLO/
+jfc,stocks,"Jollibee Foods Corporation",https://www.pse.com.ph/company-information-JFC/

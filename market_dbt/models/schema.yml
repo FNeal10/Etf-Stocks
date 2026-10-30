@@ -1,5 +1,23 @@
 version: 2
 
+models:
+  - name: stg_market_urls
+    description: "Staging model for market URLs"
+    columns:
+      - name: ticker
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_stocks_market_prices_url
+    description: "Staging model for market prices"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ticker
+              - transaction_date
+      
 sources:
   -  name: market_data
      description: "Market data source"
@@ -7,3 +25,10 @@ sources:
      tables:
        - name: "market_prices"
          description: "Stock prices data"
+         
+  - name: market_urls
+    description: "Market URLs source"
+    schema: "dbo"
+    tables:
+      - name: "market_urls"
+        description: "URLs for market data scraping"
