@@ -26,5 +26,9 @@ logs/
 # Notebooks
 *.ipynb
 
+# dbt profile
+/.dbt/
+
+
 
 
