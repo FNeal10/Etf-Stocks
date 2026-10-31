@@ -1,7 +1,7 @@
 SELECT DISTINCT
     Ticker AS ticker,
-    TransactionDate AS transaction_date,
     CONVERT(int, CONVERT(char(8), TransactionDate, 112)) AS date_key,
+    TransactionDate AS transaction_date,
     PriceOpen AS open_price,
     PriceHigh AS high_price,
     PriceLow AS low_price,

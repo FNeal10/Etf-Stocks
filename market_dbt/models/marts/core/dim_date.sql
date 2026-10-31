@@ -1,5 +1,5 @@
 SELECT DISTINCT
-    CONVERT(int, CONVERT(char(8), transaction_date, 112)) AS date_key,
+    date_key,
     transaction_date,
     [year],
     [month],

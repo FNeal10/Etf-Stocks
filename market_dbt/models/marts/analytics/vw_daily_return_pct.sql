@@ -19,10 +19,11 @@ SELECT
     ticker,
     date_key,
     close_price,
+    previous_close,
     close_price - previous_close AS price_change,
     CAST
     (
-        (close_price - previous_close) / previous_close * 100 AS DECIMAL(10,2)
+        (close_price - previous_close) / previous_close * 100 
     ) AS daily_return_pct
 FROM previous_prices
 

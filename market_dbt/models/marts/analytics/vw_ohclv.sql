@@ -1,6 +1,7 @@
 SELECT
     ticker,
     date_key,
+    transaction_date,
     open_price,
     high_price,
     low_price,
