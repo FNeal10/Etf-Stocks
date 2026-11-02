@@ -1,10 +1,9 @@
 SELECT
     ticker,
     date_key,
-    transaction_date,
-    open_price,
-    high_price,
-    low_price,
-    close_price,
-    volume
+    price_open,
+    price_high,
+    price_low,
+    price_close,
+    price_volume
 FROM {{ ref('stg_stocks_market_prices') }}

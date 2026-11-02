@@ -10,7 +10,7 @@ if os.path.exists('.env'):
     load_dotenv()
     
 
-def main():
+def main(server_type=1):
     silver = get_silver_data()
     if silver is not None:
         
@@ -27,7 +27,7 @@ def main():
         print(silver.columns)
         print("Silver data fetched successfully.")
         
-        upload_data = load_to_staging(silver)
+        upload_data = load_to_staging(silver, server_type=server_type)
         print(upload_data)
         
         

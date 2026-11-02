@@ -9,11 +9,14 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-def load_to_staging(df):
+def load_to_staging(df, server_type=1):
     """
     Load Silver data into Azure SQL staging, execute the upsert
     procedure, and commit the entire operation once.
 
+    1 = Azure SQL Server
+    2 = Local SQL Server
+    
     Returns:
         bool: True if successful, False otherwise.
     """
@@ -22,67 +25,38 @@ def load_to_staging(df):
         print("No data to load.")
         return True
 
-    # Validate required environment variables
-    required_variables = [
-        "DB_AZURE_SERVER",
-        "DB_AZURE_DATABASE",
-        "DB_AZURE_USERNAME",
-        "DB_AZURE_PASSWORD",
-        "DB_AZURE_STAGING_TABLE_NAME",
-    ]
-
-    missing_variables = [
-        name for name in required_variables
-        if not os.getenv(name)
-    ]
-
-    if missing_variables:
-        print(
-            "Missing environment variables: "
-            + ", ".join(missing_variables)
-        )
-        return False
-
-    staging_table = os.getenv("DB_AZURE_STAGING_TABLE_NAME")
-
-    # Prevent SQL identifier injection through the table setting.
-    # Expected format: dbo.marketprices_staging
-    table_parts = staging_table.split(".")
-
-    if (
-        len(table_parts) != 2
-        or not all(
-            part.replace("_", "").isalnum()
-            for part in table_parts
-        )
-    ):
-        print(
-            "Invalid staging table name. "
-            "Use a schema-qualified name such as "
-            "dbo.marketprices_staging."
-        )
-        return False
-
-    staging_table_sql = ".".join(
-        f"[{part}]" for part in table_parts
-    )
-
     connection = None
 
     try:
-        print("Connecting to Azure SQL Database...")
-
-        connection = pyodbc.connect(
-            "DRIVER={ODBC Driver 18 for SQL Server};"
-            f"SERVER=tcp:{os.getenv('DB_AZURE_SERVER')},1433;"
-            f"DATABASE={os.getenv('DB_AZURE_DATABASE')};"
-            f"UID={os.getenv('DB_AZURE_USERNAME')};"
-            f"PWD={os.getenv('DB_AZURE_PASSWORD')};"
-            "Encrypt=yes;"
-            "TrustServerCertificate=no;"
-            "Connection Timeout=30;",
-            autocommit=False,
-        )
+       
+        if server_type == 1:
+            print("Connecting to AZURE SQL Database...")
+            staging_table_sql = os.getenv('DB_AZURE_STAGING_TABLE_NAME')
+            connection = pyodbc.connect(
+                "DRIVER={ODBC Driver 18 for SQL Server};"
+                f"SERVER=tcp:{os.getenv('DB_AZURE_SERVER')},1433;"
+                f"DATABASE={os.getenv('DB_AZURE_DATABASE')};"
+                f"UID={os.getenv('DB_AZURE_USERNAME')};"
+                f"PWD={os.getenv('DB_AZURE_PASSWORD')};"
+                "Encrypt=yes;"
+                "TrustServerCertificate=no;"
+                "Connection Timeout=30;",
+                autocommit=False,
+            )
+        else: # SQL LOCAL
+            print("Connecting to LOCAL SQL Database...")
+            staging_table_sql = os.getenv('DB_LOCAL_STAGING_TABLE_NAME')
+            connection = pyodbc.connect(
+                "DRIVER={ODBC Driver 18 for SQL Server};"
+                f"SERVER={os.getenv('DB_LOCAL_SERVER')};"
+                f"DATABASE={os.getenv('DB_LOCAL_DATABASE')};"
+                f"UID={os.getenv('DB_LOCAL_USERNAME')};"
+                f"PWD={os.getenv('DB_LOCAL_PASSWORD')};"
+                "Encrypt=yes;"
+                "TrustServerCertificate=yes;"
+                "Connection Timeout=30;",
+                autocommit=False,
+            )
 
         cursor = connection.cursor()
 
@@ -101,7 +75,7 @@ def load_to_staging(df):
         insert_sql = f"""
             INSERT INTO {staging_table_sql}
             ({column_sql})
-            VALUES ({placeholders});
+            VALUES ({placeholders})
         """
 
         # Insert rows in batches without committing

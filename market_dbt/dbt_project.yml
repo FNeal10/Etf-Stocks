@@ -32,9 +32,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   market_dbt:
     staging:
-      +materialized: ephemeral
+      +materialized: view
+    intermediate:
+      +materialized: view
     marts:
       core:
-        +materialized: table
+        +schema: reports
+        +materialized: view
       analytics:
+        +schema: reports
         +materialized: view
