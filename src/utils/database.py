@@ -40,7 +40,7 @@ def load_to_staging(df, server_type=1):
                 f"PWD={os.getenv('DB_AZURE_PASSWORD')};"
                 "Encrypt=yes;"
                 "TrustServerCertificate=no;"
-                "Connection Timeout=50;",
+                "Connection Timeout=120;",
                 autocommit=False,
             )
         else: # SQL LOCAL
