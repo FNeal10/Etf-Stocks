@@ -1,5 +1,5 @@
-
 import os
+import time
 import pyodbc
 import pandas as pd
 from dotenv import load_dotenv
@@ -9,6 +9,32 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
+
+def connect_to_azure_sql(connectionString, retries=5, timeout=120):
+
+    for attempt in range(1, retries + 1):
+        try:
+            print(f"Connecting to Azure SQL... Attempt {attempt}/{retries}")
+
+            connection = pyodbc.connect(
+                connectionString,
+                timeout=timeout,
+                autocommit=False
+            )
+
+            print("Connected to Azure SQL Database.")
+            return connection
+
+        except pyodbc.Error as e:
+            print(f"Attempt {attempt} failed: {e}")
+
+            if attempt == retries:
+                raise
+
+            wait_time = 30
+            print(f"Retrying in {wait_time} seconds...")
+            time.sleep(wait_time)
+    
 def load_to_staging(df, server_type=1):
     """
     Load Silver data into Azure SQL staging, execute the upsert
@@ -32,7 +58,7 @@ def load_to_staging(df, server_type=1):
         if server_type == 1:
             print("Connecting to AZURE SQL Database...")
             staging_table_sql = os.getenv('DB_AZURE_STAGING_TABLE_NAME')
-            connection = pyodbc.connect(
+            connection_string = (
                 "DRIVER={ODBC Driver 18 for SQL Server};"
                 f"SERVER=tcp:{os.getenv('DB_AZURE_SERVER')},1433;"
                 f"DATABASE={os.getenv('DB_AZURE_DATABASE')};"
@@ -40,9 +66,14 @@ def load_to_staging(df, server_type=1):
                 f"PWD={os.getenv('DB_AZURE_PASSWORD')};"
                 "Encrypt=yes;"
                 "TrustServerCertificate=no;"
-                "Connection Timeout=120;",
-                autocommit=False,
             )
+
+            connection = connect_to_azure_sql(
+                connection_string,
+                retries=5,
+                timeout=120
+            )
+            
         else: # SQL LOCAL
             print("Connecting to LOCAL SQL Database...")
             staging_table_sql = os.getenv('DB_LOCAL_STAGING_TABLE_NAME')

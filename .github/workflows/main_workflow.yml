@@ -16,14 +16,14 @@ jobs:
       SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
 
   load-to-db:
-    needs: scrape-and-transform
-    uses: ./.github/workflows/load_to_azure.yml
-    secrets:
-      AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
-      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-      SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
-      DB_AZURE_SERVER: ${{ secrets.DB_AZURE_SERVER }}
-      DB_AZURE_DATABASE: ${{ secrets.DB_AZURE_DATABASE }}
-      DB_AZURE_USERNAME: ${{ secrets.DB_AZURE_USERNAME }}
-      DB_AZURE_PASSWORD: ${{ secrets.DB_AZURE_PASSWORD }}
-      DB_AZURE_STAGING_TABLE_NAME: ${{ secrets.DB_AZURE_STAGING_TABLE_NAME }}
+     needs: scrape-and-transform
+     uses: ./.github/workflows/load_to_azure.yml
+     secrets:
+       AZURE_CONNECTION_STRING: ${{ secrets.AZURE_CONNECTION_STRING }}
+       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+       SILVER_LOCATION: ${{ secrets.SILVER_LOCATION }}
+       DB_AZURE_SERVER: ${{ secrets.DB_AZURE_SERVER }}
+       DB_AZURE_DATABASE: ${{ secrets.DB_AZURE_DATABASE }}
+       DB_AZURE_USERNAME: ${{ secrets.DB_AZURE_USERNAME }}
+       DB_AZURE_PASSWORD: ${{ secrets.DB_AZURE_PASSWORD }}
+       DB_AZURE_STAGING_TABLE_NAME: ${{ secrets.DB_AZURE_STAGING_TABLE_NAME }}
