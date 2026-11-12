@@ -3,7 +3,8 @@ name: Main Workflow
 
 on:
   schedule:
-   - cron: '30 15 * * 1-5'   
+   - cron: '42 8 * * 1-5'  
+     timezone: 'America/Toronto' 
   workflow_dispatch:
 
 jobs:
